@@ -1,0 +1,422 @@
+{
+  "init": {
+    "phase": "init",
+    "message_count": 1,
+    "last_message": "Hi, I'm PD3r, but you can call me Pete. I help write Federal Position Descriptions. Would you like me to help you write a PD?",
+    "interview_values": {},
+    "is_supervisor": null,
+    "missing_fields": [
+      "position_title",
+      "series",
+      "grade",
+      "organization_hierarchy",
+      "reports_to",
+      "daily_activities",
+      "major_duties",
+      "is_supervisor"
+    ],
+    "current_field": null,
+    "current_element_name": null,
+    "draft_element_count": 0,
+    "draft_elements": [],
+    "should_end": false
+  },
+  "interview": {
+    "phase": "interview",
+    "message_count": 4,
+    "last_message": "Next, share the official OPM series code for this position. If you're not sure, you can look it up on the OPM/USAJOBS series tables.",
+    "interview_values": {
+      "position_title": "Supervisory IT Specialist",
+      "is_supervisor": true
+    },
+    "is_supervisor": true,
+    "missing_fields": [
+      "series",
+      "grade",
+      "organization_hierarchy",
+      "reports_to",
+      "daily_activities",
+      "major_duties",
+      "supervised_employees",
+      "f1_program_scope",
+      "f2_organizational_setting",
+      "f3_supervisory_authorities",
+      "f4_key_contacts",
+      "f5_subordinate_details",
+      "f6_special_conditions"
+    ],
+    "current_field": "series",
+    "current_element_name": null,
+    "draft_element_count": 0,
+    "draft_elements": [],
+    "should_end": false
+  },
+  "requirements": {
+    "phase": "requirements",
+    "message_count": 40,
+    "last_message": "\ud83c\udf89 **Interview Complete!**\n\nHere's what I have for your position description:\n\n**Core Position Information**\n  \u2022 Position Title: Supervisory IT Specialist\n  \u2022 Series: 2210\n  \u2022 Grade: 14\n\n**Organization",
+    "interview_values": {
+      "position_title": "Supervisory IT Specialist",
+      "organization_hierarchy": [
+        "Department of Veterans Affairs",
+        "Office of Information and Technology",
+        "Enterprise Cloud Solutions Office"
+      ],
+      "series": "2210",
+      "grade": "14",
+      "is_supervisor": true,
+      "num_supervised": 8,
+      "percent_supervising": 30,
+      "supervised_employees": "8 IT specialists across GS-9 to GS-13 levels",
+      "f1_program_scope": 4,
+      "f2_organizational_setting": 3,
+      "f3_supervisory_authorities": 4,
+      "f4_key_contacts": 3,
+      "f5_subordinate_details": "8 subordinates across 3 grade levels performing systems administration, cloud operations, and security compliance work",
+      "f6_special_conditions": "24/7 on-call responsibility for critical system outages; manages classified and sensitive Veteran health data systems",
+      "reports_to": "Deputy Chief Information Officer",
+      "daily_activities": [
+        "Oversee cloud infrastructure operations and team of system administrators",
+        "Conduct performance reviews and mentoring sessions",
+        "Coordinate with security team on ATO compliance",
+        "Review and approve change requests",
+        "Attend leadership meetings on IT modernization"
+      ],
+      "major_duties": [
+        "duty_statement: Direct cloud infrastructure operations and ensure 99.9% uptime for Veteran-facing systems",
+        "percent_time (35%)",
+        "duty_statement: Supervise and develop a team of 8 IT specialists across GS-9 to GS-13 levels",
+        "percent_time (30%)",
+        "duty_statement: Lead IT modernization initiatives and cloud migration projects",
+        "percent_time (20%)",
+        "duty_statement: Serve as technical advisor to senior leadership on infrastructure strategy",
+        "percent_time (15%)"
+      ]
+    },
+    "is_supervisor": true,
+    "missing_fields": [],
+    "current_field": null,
+    "current_element_name": null,
+    "draft_element_count": 0,
+    "draft_elements": [],
+    "should_end": false
+  },
+  "drafting": {
+    "phase": "drafting",
+    "message_count": 49,
+    "last_message": "\ud83d\udcdd **Introduction**\n\n---\nThis position serves as the Supervisory IT Specialist (GS-2210-14) within the Office of Information Technology, reporting directly to the Deputy Chief Information Officer. The ",
+    "interview_values": {
+      "position_title": "Supervisory IT Specialist",
+      "organization_hierarchy": [
+        "Department of Veterans Affairs",
+        "Office of Information and Technology",
+        "Enterprise Cloud Solutions Office"
+      ],
+      "series": "2210",
+      "grade": "14",
+      "is_supervisor": true,
+      "num_supervised": 8,
+      "percent_supervising": 30,
+      "supervised_employees": "8 IT specialists across GS-9 to GS-13 levels",
+      "f1_program_scope": 4,
+      "f2_organizational_setting": 3,
+      "f3_supervisory_authorities": 4,
+      "f4_key_contacts": 3,
+      "f5_subordinate_details": "8 subordinates across 3 grade levels performing systems administration, cloud operations, and security compliance work",
+      "f6_special_conditions": "24/7 on-call responsibility for critical system outages; manages classified and sensitive Veteran health data systems",
+      "reports_to": "Deputy Chief Information Officer",
+      "daily_activities": [
+        "Oversee cloud infrastructure operations and team of system administrators",
+        "Conduct performance reviews and mentoring sessions",
+        "Coordinate with security team on ATO compliance",
+        "Review and approve change requests",
+        "Attend leadership meetings on IT modernization"
+      ],
+      "major_duties": [
+        "duty_statement: Direct cloud infrastructure operations and ensure 99.9% uptime for Veteran-facing systems",
+        "percent_time (35%)",
+        "duty_statement: Supervise and develop a team of 8 IT specialists across GS-9 to GS-13 levels",
+        "percent_time (30%)",
+        "duty_statement: Lead IT modernization initiatives and cloud migration projects",
+        "percent_time (20%)",
+        "duty_statement: Serve as technical advisor to senior leadership on infrastructure strategy",
+        "percent_time (15%)"
+      ]
+    },
+    "is_supervisor": true,
+    "missing_fields": [],
+    "current_field": null,
+    "current_element_name": "introduction",
+    "draft_element_count": 18,
+    "draft_elements": [
+      {
+        "name": "introduction",
+        "display_name": "Introduction",
+        "status": "qa_passed",
+        "content": "This position serves as the Supervisory IT Specialist (GS-2210-14) within the Office of Information ..."
+      },
+      {
+        "name": "background",
+        "display_name": "Background",
+        "status": "qa_passed",
+        "content": "The Enterprise Cloud Solutions Office is a component of Office of Information and Technology, within..."
+      },
+      {
+        "name": "major_duties",
+        "display_name": "Major Duties and Responsibilities",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_1_knowledge",
+        "display_name": "Factor 1: Knowledge Required",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_2_supervisory_controls",
+        "display_name": "Factor 2: Supervisory Controls",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_3_guidelines",
+        "display_name": "Factor 3: Guidelines",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_4_complexity",
+        "display_name": "Factor 4: Complexity",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_5_scope_effect",
+        "display_name": "Factor 5: Scope and Effect",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_6_7_contacts",
+        "display_name": "Factor 6/7: Personal Contacts and Purpose of Contacts",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_8_physical_demands",
+        "display_name": "Factor 8: Physical Demands",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_9_work_environment",
+        "display_name": "Factor 9: Work Environment",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "other_significant_factors",
+        "display_name": "Other Significant Factors",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "supervisory_factor_1_program_scope",
+        "display_name": "Supervisory Factor 1: Program Scope and Effect",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "supervisory_factor_2_organizational_setting",
+        "display_name": "Supervisory Factor 2: Organizational Setting",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "supervisory_factor_3_authority",
+        "display_name": "Supervisory Factor 3: Supervisory and Managerial Authority",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "supervisory_factor_4_contacts",
+        "display_name": "Supervisory Factor 4: Personal Contacts",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "supervisory_factor_5_work_directed",
+        "display_name": "Supervisory Factor 5: Difficulty of Work Directed",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "supervisory_factor_6_other_conditions",
+        "display_name": "Supervisory Factor 6: Other Conditions",
+        "status": "pending",
+        "content": null
+      }
+    ],
+    "should_end": false
+  },
+  "complete": {
+    "phase": "complete",
+    "message_count": 140,
+    "last_message": "Your position description has been finalized.\n\nHow would you like to export it?\n- Say **'word'** for a Word document (.docx)\n- Say **'markdown'** for a Markdown file (.md)\n- Or say **'done'** if you d",
+    "interview_values": {
+      "position_title": "Supervisory IT Specialist",
+      "organization_hierarchy": [
+        "Department of Veterans Affairs",
+        "Office of Information and Technology",
+        "Enterprise Cloud Solutions Office"
+      ],
+      "series": "2210",
+      "grade": "14",
+      "is_supervisor": true,
+      "num_supervised": 8,
+      "percent_supervising": 30,
+      "supervised_employees": "8 IT specialists across GS-9 to GS-13 levels",
+      "f1_program_scope": 4,
+      "f2_organizational_setting": 3,
+      "f3_supervisory_authorities": 4,
+      "f4_key_contacts": 3,
+      "f5_subordinate_details": "8 subordinates across 3 grade levels performing systems administration, cloud operations, and security compliance work",
+      "f6_special_conditions": "24/7 on-call responsibility for critical system outages; manages classified and sensitive Veteran health data systems",
+      "reports_to": "Deputy Chief Information Officer",
+      "daily_activities": [
+        "Oversee cloud infrastructure operations and team of system administrators",
+        "Conduct performance reviews and mentoring sessions",
+        "Coordinate with security team on ATO compliance",
+        "Review and approve change requests",
+        "Attend leadership meetings on IT modernization"
+      ],
+      "major_duties": [
+        "duty_statement: Direct cloud infrastructure operations and ensure 99.9% uptime for Veteran-facing systems",
+        "percent_time (35%)",
+        "duty_statement: Supervise and develop a team of 8 IT specialists across GS-9 to GS-13 levels",
+        "percent_time (30%)",
+        "duty_statement: Lead IT modernization initiatives and cloud migration projects",
+        "percent_time (20%)",
+        "duty_statement: Serve as technical advisor to senior leadership on infrastructure strategy",
+        "percent_time (15%)"
+      ]
+    },
+    "is_supervisor": true,
+    "missing_fields": [],
+    "current_field": null,
+    "current_element_name": "supervisory_factor_6_other_conditions",
+    "draft_element_count": 18,
+    "draft_elements": [
+      {
+        "name": "introduction",
+        "display_name": "Introduction",
+        "status": "approved",
+        "content": "This position serves as the Supervisory IT Specialist (GS-2210-14) within the Office of Information ..."
+      },
+      {
+        "name": "background",
+        "display_name": "Background",
+        "status": "approved",
+        "content": "The Enterprise Cloud Solutions Office is a component of Office of Information and Technology, within..."
+      },
+      {
+        "name": "major_duties",
+        "display_name": "Major Duties and Responsibilities",
+        "status": "approved",
+        "content": "Project/Program Management (30%): The incumbent directs day-to-day cloud infrastructure operations s..."
+      },
+      {
+        "name": "factor_1_knowledge",
+        "display_name": "Factor 1: Knowledge Required",
+        "status": "approved",
+        "content": "The position requires thorough knowledge of laws, regulations, policies, and precedents affecting a ..."
+      },
+      {
+        "name": "factor_2_supervisory_controls",
+        "display_name": "Factor 2: Supervisory Controls",
+        "status": "approved",
+        "content": "The employee works under the general direction of the Deputy Chief Information Officer (DCIO). The s..."
+      },
+      {
+        "name": "factor_3_guidelines",
+        "display_name": "Factor 3: Guidelines",
+        "status": "approved",
+        "content": "Guidelines consist of general administrative policies and broad management directives that state des..."
+      },
+      {
+        "name": "factor_4_complexity",
+        "display_name": "Factor 4: Complexity",
+        "status": "approved",
+        "content": "The work requires resolving complex IT infrastructure and modernization issues affecting Veteran-fac..."
+      },
+      {
+        "name": "factor_5_scope_effect",
+        "display_name": "Factor 5: Scope and Effect",
+        "status": "approved",
+        "content": "The purpose of this position is to ensure reliable, secure, and modern cloud infrastructure services..."
+      },
+      {
+        "name": "factor_6_7_contacts",
+        "display_name": "Factor 6/7: Personal Contacts and Purpose of Contacts",
+        "status": "approved",
+        "content": "Personal contacts are within the immediate office or work group on a continuing basis with subordina..."
+      },
+      {
+        "name": "factor_8_physical_demands",
+        "display_name": "Factor 8: Physical Demands",
+        "status": "approved",
+        "content": "The work is primarily sedentary, although some slight physical effort may be required...."
+      },
+      {
+        "name": "factor_9_work_environment",
+        "display_name": "Factor 9: Work Environment",
+        "status": "approved",
+        "content": "Work is typically performed in an adequately lighted and climate controlled office. May require occa..."
+      },
+      {
+        "name": "other_significant_factors",
+        "display_name": "Other Significant Factors",
+        "status": "approved",
+        "content": "**Customer Service:** Sets service expectations and monitors quality; resolves escalations and drive..."
+      },
+      {
+        "name": "supervisory_factor_1_program_scope",
+        "display_name": "Supervisory Factor 1: Program Scope and Effect",
+        "status": "approved",
+        "content": "The incumbent directs and oversees a segment of the agency\u2019s enterprise IT program responsible for c..."
+      },
+      {
+        "name": "supervisory_factor_2_organizational_setting",
+        "display_name": "Supervisory Factor 2: Organizational Setting",
+        "status": "approved",
+        "content": "The incumbent serves as a first-line supervisor and technical leader within the Office of Informatio..."
+      },
+      {
+        "name": "supervisory_factor_3_authority",
+        "display_name": "Supervisory Factor 3: Supervisory and Managerial Authority",
+        "status": "approved",
+        "content": "The incumbent exercises first-level supervisory and managerial authority over eight IT Specialists (..."
+      },
+      {
+        "name": "supervisory_factor_4_contacts",
+        "display_name": "Supervisory Factor 4: Personal Contacts",
+        "status": "approved",
+        "content": "The incumbent maintains regular personal contacts inherent to directing enterprise cloud infrastruct..."
+      },
+      {
+        "name": "supervisory_factor_5_work_directed",
+        "display_name": "Supervisory Factor 5: Difficulty of Work Directed",
+        "status": "approved",
+        "content": "The incumbent directs and evaluates the work of eight IT Specialists performing systems administrati..."
+      },
+      {
+        "name": "supervisory_factor_6_other_conditions",
+        "display_name": "Supervisory Factor 6: Other Conditions",
+        "status": "approved",
+        "content": "The incumbent works in an enterprise IT operations environment supporting Veteran-facing systems wit..."
+      }
+    ],
+    "should_end": false
+  }
+}

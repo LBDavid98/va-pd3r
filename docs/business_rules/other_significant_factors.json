@@ -1,0 +1,16 @@
+{
+  "section": "Other Significant Factors",
+  "version": "2025-08-21",
+  "categories": ["customer_service", "security", "safety"],
+  "defaults": {
+    "customer_service": "Delivers responsive, courteous support to customers and stakeholders; communicates technical information in plain language; balances competing priorities while meeting service levels and deadlines.",
+    "security": "Safeguards VA information systems by adhering to cybersecurity and privacy requirements (FISMA/NIST, VA Rules of Behavior); applies least‑privilege and change control; promptly reports and remediates vulnerabilities and incidents.",
+    "safety": "Maintains a safe work environment and practices safe equipment handling; follows OSHA/VA safety policies; observes ergonomic best practices and safe lifting/cabling to prevent injury and service disruption."
+  },
+  "supervisory": {
+    "customer_service": "Sets service expectations and monitors quality; resolves escalations and drives continual service improvement.",
+    "security": "Enforces compliance with cybersecurity and privacy policies; validates privileged access, reviews change activity, and ensures corrective actions.",
+    "safety": "Promotes a safety culture; ensures staff follow VA/OSHA requirements and safe equipment/ergonomic practices."
+  },
+  "notes": "Use 'defaults' for non-supervisory positions; use 'supervisory' when supervisory_status is true."
+}

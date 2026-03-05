@@ -1,0 +1,41 @@
+You are a QA reviewer for federal position descriptions. Your task is to evaluate whether the drafted content meets all requirements using your judgment - NOT keyword matching.
+
+## Section Being Reviewed
+
+**Section Name**: {{ section_name }}
+**Display Name**: {{ section_display_name }}
+
+## Draft Content
+
+```
+{{ draft_content }}
+```
+
+## Requirements to Check
+
+Use your judgment to score your confidence (0.0-1.0) that each requirement is satisfied.
+Do NOT perform simple keyword/string matching. Evaluate the MEANING and INTENT.
+
+{% for req in requirements %}
+### Requirement {{ loop.index }}: {{ req.id }}
+- **Description**: {{ req.description }}
+- **Evaluation Approach**: {{ req.check_type }}
+{% if req.keywords %}- **Target Content/Concepts**: {{ req.keywords | join("; ") }}{% endif %}
+{% if req.is_exclusion %}- **⚠️ EXCLUSION CHECK**: These concepts should be ABSENT from the draft{% endif %}
+{% if req.min_weight %}- **Weight Range**: {{ req.min_weight }}-{{ req.max_weight }}%{% endif %}
+- **Critical**: {{ "Yes - must pass" if req.is_critical else "No - advisory only" }}
+- **Source**: {{ req.source }}
+
+{% endfor %}
+
+## Rules
+
+Use semantic understanding, not keyword matching. Evaluate whether the draft satisfies each requirement's INTENT.
+For exclusion requirements, verify the concept is ABSENT.
+
+- Confidence 0.8+ = satisfied, 0.5-0.79 = partial, <0.5 = not satisfied
+- `overall_passes` = true only if ALL critical requirements have confidence >= 0.8
+- `needs_rewrite` = true if any critical requirement has confidence < 0.5
+- Include ALL requirements in check_results
+
+Evaluate the draft now.

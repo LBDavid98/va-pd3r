@@ -1,0 +1,301 @@
+{
+  "init": {
+    "phase": "init",
+    "message_count": 1,
+    "last_message": "Hi, I'm PD3r, but you can call me Pete. I help write Federal Position Descriptions. Would you like me to help you write a PD?",
+    "interview_values": {},
+    "is_supervisor": null,
+    "missing_fields": [
+      "position_title",
+      "series",
+      "grade",
+      "organization_hierarchy",
+      "reports_to",
+      "daily_activities",
+      "major_duties",
+      "is_supervisor"
+    ],
+    "current_field": null,
+    "current_element_name": null,
+    "draft_element_count": 0,
+    "draft_elements": [],
+    "should_end": false
+  },
+  "interview": {
+    "phase": "interview",
+    "message_count": 4,
+    "last_message": "Next, share the official OPM series code for this position. If you're not sure, you can look it up on the OPM/USAJOBS series tables.",
+    "interview_values": {
+      "position_title": "Program Analyst"
+    },
+    "is_supervisor": null,
+    "missing_fields": [
+      "series",
+      "grade",
+      "organization_hierarchy",
+      "reports_to",
+      "daily_activities",
+      "major_duties",
+      "is_supervisor"
+    ],
+    "current_field": "series",
+    "current_element_name": null,
+    "draft_element_count": 0,
+    "draft_elements": [],
+    "should_end": false
+  },
+  "requirements": {
+    "phase": "requirements",
+    "message_count": 25,
+    "last_message": "\ud83c\udf89 **Interview Complete!**\n\nHere's what I have for your position description:\n\n**Core Position Information**\n  \u2022 Position Title: Program Analyst\n  \u2022 Series: 0343\n  \u2022 Grade: 11\n\n**Organization Context**",
+    "interview_values": {
+      "position_title": "Program Analyst",
+      "organization_hierarchy": [
+        "Department of Veterans Affairs",
+        "Veterans Health Administration",
+        "Office of Health Informatics"
+      ],
+      "series": "0343",
+      "grade": "11",
+      "is_supervisor": false,
+      "reports_to": "Supervisory Program Analyst",
+      "daily_activities": [
+        "Analyze program performance data and prepare reports",
+        "Coordinate with stakeholders on program requirements",
+        "Develop and maintain tracking systems for key performance indicators",
+        "Draft policy recommendations based on data analysis",
+        "Support budget formulation and execution reviews"
+      ],
+      "major_duties": [
+        "Analyze healthcare program effectiveness and develop improvement recommendations",
+        "Coordinate cross-functional projects and track milestones",
+        "Prepare briefings, reports, and policy documents for senior leadership"
+      ]
+    },
+    "is_supervisor": false,
+    "missing_fields": [],
+    "current_field": null,
+    "current_element_name": null,
+    "draft_element_count": 0,
+    "draft_elements": [],
+    "should_end": false
+  },
+  "drafting": {
+    "phase": "drafting",
+    "message_count": 34,
+    "last_message": "\ud83d\udcdd **Introduction**\n\n---\nThe Program Analyst position, classified under GS-0343-11, is situated within the Department of Health and Human Services. Reporting directly to the Supervisory Program Analyst",
+    "interview_values": {
+      "position_title": "Program Analyst",
+      "organization_hierarchy": [
+        "Department of Veterans Affairs",
+        "Veterans Health Administration",
+        "Office of Health Informatics"
+      ],
+      "series": "0343",
+      "grade": "11",
+      "is_supervisor": false,
+      "reports_to": "Supervisory Program Analyst",
+      "daily_activities": [
+        "Analyze program performance data and prepare reports",
+        "Coordinate with stakeholders on program requirements",
+        "Develop and maintain tracking systems for key performance indicators",
+        "Draft policy recommendations based on data analysis",
+        "Support budget formulation and execution reviews"
+      ],
+      "major_duties": [
+        "Analyze healthcare program effectiveness and develop improvement recommendations",
+        "Coordinate cross-functional projects and track milestones",
+        "Prepare briefings, reports, and policy documents for senior leadership"
+      ]
+    },
+    "is_supervisor": false,
+    "missing_fields": [],
+    "current_field": null,
+    "current_element_name": "introduction",
+    "draft_element_count": 12,
+    "draft_elements": [
+      {
+        "name": "introduction",
+        "display_name": "Introduction",
+        "status": "qa_passed",
+        "content": "The Program Analyst position, classified under GS-0343-11, is situated within the Department of Heal..."
+      },
+      {
+        "name": "background",
+        "display_name": "Background",
+        "status": "qa_passed",
+        "content": "The Office of Health Informatics is a component of Veterans Health Administration, within Department..."
+      },
+      {
+        "name": "major_duties",
+        "display_name": "Major Duties and Responsibilities",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_1_knowledge",
+        "display_name": "Factor 1: Knowledge Required",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_2_supervisory_controls",
+        "display_name": "Factor 2: Supervisory Controls",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_3_guidelines",
+        "display_name": "Factor 3: Guidelines",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_4_complexity",
+        "display_name": "Factor 4: Complexity",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_5_scope_effect",
+        "display_name": "Factor 5: Scope and Effect",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_6_7_contacts",
+        "display_name": "Factor 6/7: Personal Contacts and Purpose of Contacts",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_8_physical_demands",
+        "display_name": "Factor 8: Physical Demands",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "factor_9_work_environment",
+        "display_name": "Factor 9: Work Environment",
+        "status": "pending",
+        "content": null
+      },
+      {
+        "name": "other_significant_factors",
+        "display_name": "Other Significant Factors",
+        "status": "pending",
+        "content": null
+      }
+    ],
+    "should_end": false
+  },
+  "complete": {
+    "phase": "complete",
+    "message_count": 95,
+    "last_message": "Your position description has been finalized.\n\nHow would you like to export it?\n- Say **'word'** for a Word document (.docx)\n- Say **'markdown'** for a Markdown file (.md)\n- Or say **'done'** if you d",
+    "interview_values": {
+      "position_title": "Program Analyst",
+      "organization_hierarchy": [
+        "Department of Veterans Affairs",
+        "Veterans Health Administration",
+        "Office of Health Informatics"
+      ],
+      "series": "0343",
+      "grade": "11",
+      "is_supervisor": false,
+      "reports_to": "Supervisory Program Analyst",
+      "daily_activities": [
+        "Analyze program performance data and prepare reports",
+        "Coordinate with stakeholders on program requirements",
+        "Develop and maintain tracking systems for key performance indicators",
+        "Draft policy recommendations based on data analysis",
+        "Support budget formulation and execution reviews"
+      ],
+      "major_duties": [
+        "Analyze healthcare program effectiveness and develop improvement recommendations",
+        "Coordinate cross-functional projects and track milestones",
+        "Prepare briefings, reports, and policy documents for senior leadership"
+      ]
+    },
+    "is_supervisor": false,
+    "missing_fields": [],
+    "current_field": null,
+    "current_element_name": "other_significant_factors",
+    "draft_element_count": 12,
+    "draft_elements": [
+      {
+        "name": "introduction",
+        "display_name": "Introduction",
+        "status": "approved",
+        "content": "The Program Analyst position, classified under GS-0343-11, is situated within the Department of Heal..."
+      },
+      {
+        "name": "background",
+        "display_name": "Background",
+        "status": "approved",
+        "content": "The Office of Health Informatics is a component of Veterans Health Administration, within Department..."
+      },
+      {
+        "name": "major_duties",
+        "display_name": "Major Duties and Responsibilities",
+        "status": "approved",
+        "content": "The incumbent serves as a Program Analyst responsible for assessing the effectiveness of healthcare ..."
+      },
+      {
+        "name": "factor_1_knowledge",
+        "display_name": "Factor 1: Knowledge Required",
+        "status": "approved",
+        "content": "The position requires knowledge ranging from basic office support through substantive program analys..."
+      },
+      {
+        "name": "factor_2_supervisory_controls",
+        "display_name": "Factor 2: Supervisory Controls",
+        "status": "approved",
+        "content": "The Supervisory Program Analyst assigns work to the employee through a combination of very detailed ..."
+      },
+      {
+        "name": "factor_3_guidelines",
+        "display_name": "Factor 3: Guidelines",
+        "status": "approved",
+        "content": "The employee uses detailed and specific guidelines and follows clear-cut steps to analyze healthcare..."
+      },
+      {
+        "name": "factor_4_complexity",
+        "display_name": "Factor 4: Complexity",
+        "status": "approved",
+        "content": "Assignments involve procedural problems where the employee applies analytic techniques to collect an..."
+      },
+      {
+        "name": "factor_5_scope_effect",
+        "display_name": "Factor 5: Scope and Effect",
+        "status": "approved",
+        "content": "The purpose of the work is to support managers and staff by providing timely, accurate program and a..."
+      },
+      {
+        "name": "factor_6_7_contacts",
+        "display_name": "Factor 6/7: Personal Contacts and Purpose of Contacts",
+        "status": "approved",
+        "content": "Personal contacts are primarily within the immediate office or work group, including the Supervisory..."
+      },
+      {
+        "name": "factor_8_physical_demands",
+        "display_name": "Factor 8: Physical Demands",
+        "status": "approved",
+        "content": "The work is primarily sedentary, although some slight physical effort may be required...."
+      },
+      {
+        "name": "factor_9_work_environment",
+        "display_name": "Factor 9: Work Environment",
+        "status": "approved",
+        "content": "Work is typically performed in an adequately lighted and climate controlled office. May require occa..."
+      },
+      {
+        "name": "other_significant_factors",
+        "display_name": "Other Significant Factors",
+        "status": "approved",
+        "content": "**Customer Service:** Delivers responsive, courteous support to customers and stakeholders; communic..."
+      }
+    ],
+    "should_end": false
+  }
+}

@@ -1,0 +1,32 @@
+# Edge Case Test Script
+# Tests error handling and edge cases
+
+# Start with ambiguous intent
+Hi there
+
+# Provide incomplete information
+I need a position
+
+# Expect clarifying question
+@EXPECT:?
+
+# Give invalid grade
+Make it a GS-20 position
+
+# Should handle gracefully
+@EXPECT:grade
+
+# Try to skip ahead
+Can we just generate the PD now?
+
+@PAUSE
+
+# Test conversation recovery
+Never mind, let's start over with a GS-12 position
+
+@EXPECT:GS-12
+
+# Abrupt ending
+quit
+
+@END

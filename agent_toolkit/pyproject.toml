@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-toolkit"
+version = "0.1.0"
+description = "The Rolls-Royce of performance tuning tools for LangGraph agents"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Agent Toolkit", email = "toolkit@example.com"}
+]
+keywords = ["langgraph", "langchain", "agent", "llm", "analysis", "testing"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "httpx>=0.24",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+langchain = [
+    "langchain-openai>=1.0",
+    "langgraph>=1.0",
+]
+all = [
+    "langchain-openai>=1.0",
+    "langgraph>=1.0",
+]
+
+[project.scripts]
+anode = "agent_toolkit.tools.anode:main"
+agentscript = "agent_toolkit.tools.agentscript:main"
+agent_health = "agent_toolkit.tools.health_check:main"
+agent_lint = "agent_toolkit.tools.lint:main"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/agent-toolkit"
+Documentation = "https://github.com/yourusername/agent-toolkit#readme"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["agent_toolkit*"]
+
+[tool.setuptools.package-data]
+agent_toolkit = ["scripts/*.txt"]

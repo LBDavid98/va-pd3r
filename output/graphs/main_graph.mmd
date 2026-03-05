@@ -1,0 +1,116 @@
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#e8f4f8',
+    'primaryTextColor': '#1a1a2e',
+    'primaryBorderColor': '#4a90a4',
+    'lineColor': '#5a7d8c',
+    'secondaryColor': '#f0f7e6',
+    'tertiaryColor': '#fff8e6'
+  },
+  'flowchart': {
+    'curve': 'basis',
+    'padding': 20,
+    'nodeSpacing': 50,
+    'rankSpacing': 60
+  }
+}}%%
+graph TD
+    __start__((Start))
+    init[Initialize<br>Session]
+    user_input[Get User<br>Input]
+    classify_intent{Classify<br>Intent}
+    end_conversation([End<br>Conversation])
+    map_answers[Map<br>Answers]
+    answer_question[Answer<br>Question]
+    prepare_next[Prepare<br>Next Question]
+    check_interview_complete[Check Interview<br>Complete]
+    evaluate_fes[Evaluate<br>FES Factors]
+    gather_requirements[Gather Draft<br>Requirements]
+    generate_element[Generate<br>Draft Element]
+    qa_review[QA<br>Review]
+    handle_draft_response[Handle Draft<br>Response]
+    advance_element{Advance to<br>Next Element}
+    finalize[Finalize]
+    handle_element_revision[Handle Element Revision]
+    handle_write_another[Handle Write Another]
+    export_document[Export Document]
+    error_handler[Error Handler]
+    __end__((End))
+
+    %% Edges
+    __start__ --> init
+    advance_element -.-> end_conversation
+    advance_element -.-> error_handler
+    advance_element -.-> finalize
+    advance_element -.-> generate_element
+    advance_element -.-> user_input
+    answer_question --> user_input
+    check_interview_complete --> prepare_next
+    classify_intent -.-> answer_question
+    classify_intent -.-> check_interview_complete
+    classify_intent -.-> end_conversation
+    classify_intent -.-> error_handler
+    classify_intent -.-> evaluate_fes
+    classify_intent -.-> export_document
+    classify_intent -.-> finalize
+    classify_intent -.-> handle_draft_response
+    classify_intent -.-> handle_element_revision
+    classify_intent -.-> handle_write_another
+    classify_intent -.-> init
+    classify_intent -.-> map_answers
+    classify_intent -. &nbsp;handle_unrecognized&nbsp; .-> prepare_next
+    classify_intent -.-> user_input
+    end_conversation -.-> __end__
+    end_conversation -.-> error_handler
+    end_conversation -.-> init
+    end_conversation -.-> user_input
+    error_handler -.-> user_input
+    evaluate_fes --> gather_requirements
+    export_document -.-> end_conversation
+    export_document -.-> error_handler
+    export_document -.-> user_input
+    finalize -.-> user_input
+    gather_requirements --> generate_element
+    generate_element -.-> qa_review
+    generate_element -.-> user_input
+    handle_draft_response -.-> advance_element
+    handle_draft_response -.-> error_handler
+    handle_draft_response -.-> generate_element
+    handle_element_revision -.-> error_handler
+    handle_element_revision -.-> generate_element
+    handle_element_revision -.-> user_input
+    handle_write_another --> end_conversation
+    init -.-> user_input
+    map_answers --> prepare_next
+    prepare_next --> user_input
+    qa_review -.-> error_handler
+    qa_review -.-> generate_element
+    qa_review -.-> user_input
+    user_input --> classify_intent
+
+    %% Styles
+%% Phase styles
+    classDef startEnd fill:#e6f3ff,stroke:#2196F3,stroke-width:2px,color:#1565C0
+    classDef init fill:#fff3e0,stroke:#FF9800,stroke-width:2px,color:#E65100
+    classDef interview fill:#e8f5e9,stroke:#4CAF50,stroke-width:2px,color:#2E7D32
+    classDef drafting fill:#f3e5f5,stroke:#9C27B0,stroke-width:2px,color:#6A1B9A
+    classDef qa fill:#fff8e1,stroke:#FFC107,stroke-width:2px,color:#F57F17
+    classDef routing fill:#fce4ec,stroke:#E91E63,stroke-width:1px,color:#880E4F,stroke-dasharray:3
+
+    class __end__ startEnd
+    class end_conversation startEnd
+    class handle_draft_response drafting
+    class check_interview_complete interview
+    class user_input interview
+    class init init
+    class map_answers interview
+    class qa_review qa
+    class gather_requirements drafting
+    class classify_intent routing
+    class __start__ startEnd
+    class evaluate_fes drafting
+    class answer_question interview
+    class prepare_next interview
+    class advance_element routing
+    class generate_element drafting

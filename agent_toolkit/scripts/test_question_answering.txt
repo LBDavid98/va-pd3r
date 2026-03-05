@@ -1,0 +1,129 @@
+# Question Answering & Intent Classification Test Script
+# Tests RAG, process questions, and intent classifier accuracy
+# Run with: agentscript agent_toolkit/scripts/test_question_answering.txt --stream -v 2
+# Then analyze with: anode output/logs/<trace>.jsonl
+# 
+# This script intentionally does NOT complete the interview.
+# Goal: Test ask_question intent and answer_question node behavior.
+
+# =============================================================================
+# Phase 1: Start conversation with a question (tests greeting + early question)
+# =============================================================================
+
+Hello, what exactly is a position description?
+
+# Should recognize ask_question intent and provide helpful info
+@EXPECT:description
+
+@WAIT:1
+
+# =============================================================================
+# Phase 2: HR/RAG Questions (should trigger RAG lookup)
+# =============================================================================
+
+# FES-related question - should be marked is_hr_specific=True
+What is FES and how does it work?
+
+@EXPECT:Factor
+
+@WAIT:1
+
+# Grade determination - HR-specific
+How are GS grades determined?
+
+@WAIT:1
+
+# Factor levels question - definitely HR knowledge
+Can you explain Factor 1 - Knowledge Required by the Position?
+
+@EXPECT:knowledge
+
+@WAIT:1
+
+# Classification question
+What's the difference between a GS-12 and GS-13 in terms of responsibilities?
+
+@WAIT:1
+
+# =============================================================================
+# Phase 3: Process Questions (should NOT trigger RAG)
+# =============================================================================
+
+# General process question
+What information do you need from me to create a PD?
+
+@WAIT:1
+
+# Process question about workflow
+How long does this process usually take?
+
+@WAIT:1
+
+# Question about capabilities
+Can I go back and change answers later if I make a mistake?
+
+@WAIT:1
+
+# =============================================================================
+# Phase 4: Mixed intent - Question while providing info (tests multi-intent)
+# =============================================================================
+
+# Provide some info then ask a question in same message
+I want to create a GS-13 IT Specialist position. What series code should I use?
+
+# Should detect: provide_information (has grade, title) AND ask_question (series)
+@EXPECT:series
+
+@WAIT:1
+
+# Confirm-ish response with embedded question  
+That sounds right, but what does series 2210 actually cover?
+
+@WAIT:1
+
+# =============================================================================
+# Phase 5: Edge cases - Ambiguous questions
+# =============================================================================
+
+# Very short question
+What's a duty?
+
+@WAIT:1
+
+# Clarifying question about agent's last message
+What do you mean by that?
+
+@WAIT:1
+
+# Meta question about the conversation
+Where are we in the process?
+
+@WAIT:1
+
+# =============================================================================
+# Phase 6: More HR-specific questions to stress RAG
+# =============================================================================
+
+# Supervisory duties
+What additional factors apply to supervisory positions?
+
+@WAIT:1
+
+# Specific OPM guidance
+What does OPM say about major duties in a PD?
+
+@WAIT:1
+
+# =============================================================================
+# End without completing interview
+# =============================================================================
+
+# Final question before quit
+One more question - what happens if the position requirements change after the PD is written?
+
+@WAIT:1
+
+# Exit cleanly
+quit
+
+@END

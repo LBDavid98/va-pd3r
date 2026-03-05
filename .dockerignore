@@ -1,0 +1,14 @@
+__pycache__
+*.pyc
+.env
+.git
+.vscode
+.claude
+output/
+tests/
+scripts/
+docs/plans/
+docs/decisions/
+*.egg-info
+.pytest_cache
+.mypy_cache

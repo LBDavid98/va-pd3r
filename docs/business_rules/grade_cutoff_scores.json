@@ -1,0 +1,103 @@
+[
+  {
+    "GS_Grade": 9,
+    "Minimum": 1855,
+    "Maximum": 2100,
+    "factors": {
+      "1": { "min": { "score": 6, "points": 950 }, "max": { "score": 6, "points": 950 } },
+      "2": { "min": { "score": 3, "points": 275 }, "max": { "score": 3, "points": 275 } },
+      "3": { "min": { "score": 3, "points": 275 }, "max": { "score": 3, "points": 275 } },
+      "4": { "min": { "score": 3, "points": 150 }, "max": { "score": 3, "points": 150 } },
+      "5": { "min": { "score": 3, "points": 150 }, "max": { "score": 3, "points": 150 } },
+      "6": { "min": { "score": 2, "points": 25 }, "max": { "score": 3, "points": 60 } },
+      "7": { "min": { "score": "b", "points": 50 }, "max": { "score": "c", "points": 120 } },
+      "8": { "min": { "score": 1, "points": 5 }, "max": { "score": 1, "points": 5 } },
+      "9": { "min": { "score": 1, "points": 5 }, "max": { "score": 1, "points": 5 } }
+    }
+  },
+  {
+    "GS_Grade": 10,
+    "Minimum": 2105,
+    "Maximum": 2350
+  },
+  {
+    "GS_Grade": 11,
+    "Minimum": 2355,
+    "Maximum": 2750,
+    "factors": {
+      "1": { "min": { "score": 7, "points": 1250 }, "max": { "score": 7, "points": 1250 } },
+      "2": { "min": { "score": 4, "points": 450 }, "max": { "score": 4, "points": 450 } },
+      "3": { "min": { "score": 3, "points": 275 }, "max": { "score": 3, "points": 275 } },
+      "4": { "min": { "score": 4, "points": 225 }, "max": { "score": 5, "points": 325 } },
+      "5": { "min": { "score": 3, "points": 150 }, "max": { "score": 4, "points": 225 } },
+      "6": { "min": { "score": 2, "points": 25 }, "max": { "score": 3, "points": 60 } },
+      "7": { "min": { "score": "b", "points": 50 }, "max": { "score": "c", "points": 120 } },
+      "8": { "min": { "score": 1, "points": 5 }, "max": { "score": 1, "points": 5 } },
+      "9": { "min": { "score": 1, "points": 5 }, "max": { "score": 1, "points": 5 } }
+    }
+  },
+  {
+    "GS_Grade": 12,
+    "Minimum": 2755,
+    "Maximum": 3150,
+    "factors": {
+      "1": { "min": { "score": 7, "points": 1250 }, "max": { "score": 7, "points": 1250 } },
+      "2": { "min": { "score": 4, "points": 450 }, "max": { "score": 4, "points": 450 } },
+      "3": { "min": { "score": 4, "points": 450 }, "max": { "score": 4, "points": 450 } },
+      "4": { "min": { "score": 5, "points": 325 }, "max": { "score": 5, "points": 325 } },
+      "5": { "min": { "score": 4, "points": 225 }, "max": { "score": 4, "points": 225 } },
+      "6": { "min": { "score": 3, "points": 60 }, "max": { "score": 3, "points": 60 } },
+      "7": { "min": { "score": "c", "points": 120 }, "max": { "score": "c", "points": 120 } },
+      "8": { "min": { "score": 1, "points": 5 }, "max": { "score": 1, "points": 5 } },
+      "9": { "min": { "score": 1, "points": 5 }, "max": { "score": 1, "points": 5 } }
+    }
+  },
+  {
+    "GS_Grade": 13,
+    "Minimum": 3155,
+    "Maximum": 3600,
+    "factors": {
+      "1": { "min": { "score": 8, "points": 1550 }, "max": { "score": 8, "points": 1550 } },
+      "2": { "min": { "score": 4, "points": 450 }, "max": { "score": 4, "points": 450 } },
+      "3": { "min": { "score": 4, "points": 450 }, "max": { "score": 5, "points": 650 } },
+      "4": { "min": { "score": 5, "points": 325 }, "max": { "score": 5, "points": 325 } },
+      "5": { "min": { "score": 4, "points": 225 }, "max": { "score": 5, "points": 325 } },
+      "6": { "min": { "score": 3, "points": 60 }, "max": { "score": 3, "points": 60 } },
+      "7": { "min": { "score": "c", "points": 120 }, "max": { "score": "c", "points": 120 } },
+      "8": { "min": { "score": 1, "points": 5 }, "max": { "score": 1, "points": 5 } },
+      "9": { "min": { "score": 1, "points": 5 }, "max": { "score": 1, "points": 5 } }
+    }
+  },
+  {
+    "GS_Grade": 14,
+    "Minimum": 3605,
+    "Maximum": 4050,
+    "factors": {
+      "1": { "min": { "score": 8, "points": 1550 }, "max": { "score": 8, "points": 1550 } },
+      "2": { "min": { "score": 4, "points": 450 }, "max": { "score": 5, "points": 650 } },
+      "3": { "min": { "score": 5, "points": 650 }, "max": { "score": 5, "points": 650 } },
+      "4": { "min": { "score": 5, "points": 325 }, "max": { "score": 6, "points": 450 } },
+      "5": { "min": { "score": 5, "points": 325 }, "max": { "score": 6, "points": 450 } },
+      "6": { "min": { "score": 3, "points": 60 }, "max": { "score": 4, "points": 110 } },
+      "7": { "min": { "score": "c", "points": 120 }, "max": { "score": "d", "points": 200 } },
+      "8": { "min": { "score": 1, "points": 5 }, "max": { "score": 2, "points": 20 } },
+      "9": { "min": { "score": 1, "points": 5 }, "max": { "score": 2, "points": 20 } }
+    }
+  },
+  {
+    "GS_Grade": 15,
+    "Minimum": 4055,
+    "Maximum": null,
+    "factors": {
+      "1": { "min": { "score": 8, "points": 1550 }, "max": { "score": 8, "points": 1550 } },
+      "2": { "min": { "score": 5, "points": 650 }, "max": { "score": 5, "points": 650 } },
+      "3": { "min": { "score": 5, "points": 650 }, "max": { "score": 5, "points": 650 } },
+      "4": { "min": { "score": 6, "points": 450 }, "max": { "score": 6, "points": 450 } },
+      "5": { "min": { "score": 6, "points": 450 }, "max": { "score": 6, "points": 450 } },
+      "6": { "min": { "score": 4, "points": 110 }, "max": { "score": 4, "points": 110 } },
+      "7": { "min": { "score": "d", "points": 200 }, "max": { "score": "d", "points": 200 } },
+      "8": { "min": { "score": 1, "points": 5 }, "max": { "score": 2, "points": 20 } },
+      "9": { "min": { "score": 1, "points": 5 }, "max": { "score": 2, "points": 20 } }
+    }
+  }
+]

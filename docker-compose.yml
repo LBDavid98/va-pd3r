@@ -1,0 +1,40 @@
+services:
+  pd3r:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - PD3R_DATABASE_URL=sqlite:///./output/.sessions/checkpoints.db
+      - PD3R_VECTOR_STORE_PATH=./knowledge/vector_store
+      - PD3R_CORS_ORIGINS=["http://localhost:3000","http://localhost:5173"]
+    volumes:
+      - ./output:/app/output
+      - ./knowledge/vector_store:/app/knowledge/vector_store
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - pd3r
+    restart: unless-stopped
+
+  # Uncomment to use PostgreSQL for checkpointing instead of SQLite
+  # postgres:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_USER: pd3r
+  #     POSTGRES_PASSWORD: pd3r_dev
+  #     POSTGRES_DB: pd3r
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+
+# volumes:
+#   pgdata:

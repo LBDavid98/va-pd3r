@@ -1,0 +1,153 @@
+{
+  "series": "2210",
+  "updated": "2025-08-22",
+  "source_folders": [
+    "inputs/VA_Requests/Processed"
+  ],
+  "gs_templates": {
+    "13": {
+      "summary": "Senior specialist/individual contributor. Executes complex systems analysis, testing, integration, and development with some planning and architecture support.",
+      "ncwf_codes": ["651", "621", "802", "805"],
+      "duty_sections": [
+        {
+          "title": "Systems Analysis and Integration",
+          "percent_range": [20, 35],
+          "typical_weight": 25,
+          "description": "Analyze business and technical requirements; plan and integrate system components across environments; ensure secure configurations and interoperability.",
+          "example_tasks": [
+            "Analyze and translate stakeholder requirements into technical designs and integration plans.",
+            "Define secure configuration baselines and ensure RMF-aligned controls are applied.",
+            "Coordinate with owners to integrate components and data flows across test/pre-prod/prod."
+          ]
+        },
+        {
+          "title": "Test and Evaluation",
+          "percent_range": [20, 35],
+          "typical_weight": 25,
+          "description": "Plan and execute test strategies; operate and manage test environments; measure results and recommend fixes; support release readiness.",
+          "example_tasks": [
+            "Develop test plans, cases, and data; validate requirements for testability.",
+            "Operate and patch test environments in sync with production; manage configuration.",
+            "Analyze/report test results; recommend acceptance, remediation, or design changes."
+          ]
+        },
+        {
+          "title": "Programming / Applications Development",
+          "percent_range": [15, 30],
+          "typical_weight": 25,
+          "description": "Design, develop, and maintain applications or scripts; create documentation; support integration with enterprise systems.",
+          "example_tasks": [
+            "Design and develop application code; create workflow charts and technical specs.",
+            "Implement unit/integration tests; validate and document results.",
+            "Refactor, optimize, and maintain code; integrate COTS/APIs and shared services."
+          ]
+        },
+        {
+          "title": "Enterprise/Data Architecture Support",
+          "percent_range": [15, 35],
+          "typical_weight": 25,
+          "description": "Support enterprise/data architecture models and metadata; perform data validation and quality checks; document current/target states.",
+          "example_tasks": [
+            "Develop and maintain data models, metadata, and lineage for migration efforts.",
+            "Document architecture views and interface inventories using standard notations.",
+            "Perform data profiling, quality checks, and remediation planning."
+          ]
+        }
+      ]
+    },
+    "14": {
+      "summary": "Senior IT specialist/project manager. Leads cross-functional projects and integrations; balances PM, systems analysis, software/DevSecOps, and governance/authorization.",
+      "ncwf_codes": ["802", "621", "611", "651"],
+      "duty_sections": [
+        {
+          "title": "Project/Program Management",
+          "percent_range": [25, 40],
+          "typical_weight": 25,
+          "description": "Define scope, schedule, and budget; lead risk, acquisition, and change control; coordinate delivery across organizations.",
+          "example_tasks": [
+            "Develop and manage integrated master schedules, budgets, risks, and metrics.",
+            "Lead acquisition planning, evaluations, and COR oversight; ensure compliance.",
+            "Execute Agile/iterative delivery; manage releases and change control."
+          ]
+        },
+        {
+          "title": "Systems Analysis and Integration",
+          "percent_range": [20, 35],
+          "typical_weight": 25,
+          "description": "Develop technical plans and architectures; conduct cost/benefit and alternatives analyses; coordinate enterprise integration.",
+          "example_tasks": [
+            "Author technical plans (architecture, interfaces, hosting, security, contingency).",
+            "Coordinate multi-agency integration and data interoperability.",
+            "Perform trade studies and business case analyses to inform decisions."
+          ]
+        },
+        {
+          "title": "Applications Software / DevSecOps",
+          "percent_range": [15, 30],
+          "typical_weight": 25,
+          "description": "Lead software design, implementation, and testing; integrate COTS with legacy; embed security and quality throughout the lifecycle.",
+          "example_tasks": [
+            "Oversee design/development; enforce secure coding and test automation.",
+            "Integrate COTS/SaaS with enterprise services and data; ensure performance and resilience.",
+            "Plan and lead migration, modernization, and decommissioning of legacy apps."
+          ]
+        },
+        {
+          "title": "Governance, Authorization, and Communications",
+          "percent_range": [10, 25],
+          "typical_weight": 25,
+          "description": "Lead governance bodies and ATO activities; brief senior leaders; manage stakeholder communications and decisions.",
+          "example_tasks": [
+            "Prepare and review authorization packages; define acceptable risk thresholds.",
+            "Lead IPTs/working groups; present status, risks, and mitigation plans to leadership.",
+            "Establish standards and policies; ensure compliance and traceability."
+          ]
+        }
+      ]
+    },
+    "15": {
+      "summary": "Supervisory IT Program Manager. Provides portfolio-level strategy, directs execution of multiple programs/projects, and leads people and resources.",
+      "ncwf_codes": ["802"],
+      "duty_sections": [
+        {
+          "title": "Strategic Planning and Acquisition Governance",
+          "percent_range": [20, 30],
+          "typical_weight": 25,
+          "description": "Set program vision, strategies, and roadmaps; lead acquisition strategies and budget formulation; align architecture and policy.",
+          "example_tasks": [
+            "Establish multi-year roadmaps, goals, and KPIs aligned to agency priorities.",
+            "Lead acquisition planning and source selections; shape contracts to outcomes.",
+            "Align enterprise architecture, security, and policy with mission objectives."
+          ]
+        },
+        {
+          "title": "Program Execution and Oversight",
+          "percent_range": [40, 60],
+          "typical_weight": 50,
+          "description": "Direct execution across multiple projects; monitor performance, quality, risk, and compliance; remove barriers and resolve issues.",
+          "example_tasks": [
+            "Chair program reviews; track schedule, cost, scope, and benefits realization.",
+            "Resolve cross-program issues; negotiate priorities with internal/external partners.",
+            "Establish internal controls; ensure audits, security, and policy adherence."
+          ]
+        },
+        {
+          "title": "Supervision and Workforce Management",
+          "percent_range": [20, 30],
+          "typical_weight": 25,
+          "description": "Lead teams and supervisors; set priorities and standards; manage hiring, performance, development, and labor/EEO relations.",
+          "example_tasks": [
+            "Assign and evaluate work; set performance plans; recognize and address issues.",
+            "Hire, develop, and mentor staff; plan training and succession; manage remote teams.",
+            "Foster inclusive culture; maintain EEO compliance and effective labor relations."
+          ]
+        }
+      ]
+    }
+  },
+  "notes": {
+    "weighting_guidance": "Select weights within the provided ranges so sections sum to 100%. Emphasize leadership/strategy more at higher grades and technical execution more at GS-13.",
+    "authoritative_basis": "Synthesized from VA GS-2210 PDs in inputs/VA_Requests/Processed (GS-13, GS-14, GS-15 examples).",
+    "usage": "Choose a GS level to generate duty sections with weights and tasks; customize domain terms (e.g., EHRM) and technologies to your program context."
+  }
+}

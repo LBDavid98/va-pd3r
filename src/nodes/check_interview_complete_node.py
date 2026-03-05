@@ -1,0 +1,185 @@
+"""Check interview complete node - verifies all required data is collected."""
+
+from src.config.intake_fields import INTAKE_FIELDS, get_intake_sequence
+from src.models.interview import InterviewData
+from src.models.state import AgentState
+from src.utils.llm import traced_node
+
+
+def _format_interview_summary(interview: InterviewData) -> str:
+    """
+    Format a complete summary of collected interview data.
+
+    Args:
+        interview: The InterviewData instance
+
+    Returns:
+        Formatted summary string
+    """
+    summary_dict = interview.to_summary_dict()
+
+    if not summary_dict:
+        return "No information collected yet."
+
+    lines = ["Here's what I have for your position description:", ""]
+
+    # Group by category for cleaner display
+    categories = {
+        "Core Position Information": ["position_title", "series", "grade"],
+        "Organization Context": ["organization", "organization_hierarchy", "reports_to"],
+        "Position Duties": ["daily_activities", "major_duties"],
+        "Supervisory Information": ["is_supervisor", "supervised_employees", "num_supervised", "percent_supervising"],
+        "Supervisory Factors": ["f1_program_scope", "f2_organizational_setting", "f3_supervisory_authorities", "f4_key_contacts", "f5_subordinate_details", "f6_special_conditions"],
+    }
+
+    for category_name, field_names in categories.items():
+        category_fields = [
+            (name, summary_dict[name])
+            for name in field_names
+            if name in summary_dict
+        ]
+
+        if category_fields:
+            lines.append(f"**{category_name}**")
+            for field_name, value in category_fields:
+                friendly_name = field_name.replace("_", " ").title()
+
+                # Format value
+                if isinstance(value, list):
+                    value_str = ", ".join(str(v) for v in value)
+                elif isinstance(value, dict):
+                    value_str = "; ".join(f"{k}: {v}" for k, v in value.items())
+                elif isinstance(value, bool):
+                    value_str = "Yes" if value else "No"
+                else:
+                    value_str = str(value)
+
+                lines.append(f"  • {friendly_name}: {value_str}")
+            lines.append("")
+
+    return "\n".join(lines)
+
+
+def _check_required_fields(
+    interview: InterviewData,
+    is_supervisor: bool | None,
+) -> tuple[bool, list[str]]:
+    """
+    Check if all required fields are complete.
+
+    For supervisory positions, also includes conditional supervisory fields
+    that should be offered (even though they're technically optional).
+
+    Args:
+        interview: The InterviewData instance
+        is_supervisor: Whether position is supervisory
+
+    Returns:
+        Tuple of (is_complete, list of missing field names)
+    """
+    sequence = get_intake_sequence(is_supervisor)
+    
+    # Required fields must be collected
+    required_fields = [
+        name for name in sequence
+        if INTAKE_FIELDS.get(name) and INTAKE_FIELDS[name].required
+    ]
+    
+    missing = interview.get_unset_required_fields(required_fields)
+    
+    # For supervisory positions, also offer the optional supervisory fields
+    # These aren't strictly required but should be offered for complete PDs
+    if is_supervisor:
+        for name in sequence:
+            field = INTAKE_FIELDS.get(name)
+            if field and not field.required and field.conditional:
+                # Check if this field's condition is met
+                if field.conditional.depends_on == "is_supervisor" and field.conditional.value is True:
+                    # Offer this field if not already set
+                    if hasattr(interview, name) and not getattr(interview, name).is_set:
+                        if name not in missing:
+                            missing.append(name)
+    
+    return len(missing) == 0, missing
+
+
+def _check_confirmations_complete(interview: InterviewData) -> tuple[bool, list[str]]:
+    """
+    Check if all fields needing confirmation are confirmed.
+
+    Args:
+        interview: The InterviewData instance
+
+    Returns:
+        Tuple of (all_confirmed, list of unconfirmed field names)
+    """
+    unconfirmed = interview.get_fields_needing_confirmation()
+    return len(unconfirmed) == 0, unconfirmed
+
+
+@traced_node
+def check_interview_complete_node(state: AgentState) -> dict:
+    """
+    Pure check node - verifies all required data is collected.
+
+    This node only determines completion status and updates state flags.
+    It does NOT display messages or summaries - that's handled by prepare_next_node.
+
+    Logic:
+    1. Verifies all required fields are collected
+    2. Verifies all uncertain extractions are confirmed
+    3. If complete: sets phase="requirements", clears pending fields
+    4. If incomplete: updates missing_fields or fields_needing_confirmation
+
+    The actual user-facing summary and "Does everything look ok?" prompt
+    is generated by prepare_next_node when it sees phase="requirements".
+
+    Args:
+        state: Current agent state
+
+    Returns:
+        State update with completion flags (no messages)
+    """
+    interview_dict = state.get("interview_data")
+
+    if not interview_dict:
+        # No interview data - stay in interview phase
+        return {
+            "phase": "interview",
+            "missing_fields": ["position_title"],  # Signal to prepare_next to start
+        }
+
+    interview = InterviewData.model_validate(interview_dict)
+
+    # Determine supervisory status
+    is_supervisor = None
+    if interview.is_supervisor.is_set:
+        is_supervisor = interview.is_supervisor.value
+
+    # Check required fields
+    fields_complete, missing_fields = _check_required_fields(interview, is_supervisor)
+
+    if not fields_complete:
+        # Still have missing fields - stay in interview phase
+        return {
+            "missing_fields": missing_fields,
+            "fields_needing_confirmation": [],
+        }
+
+    # Check confirmations
+    confirmations_complete, unconfirmed = _check_confirmations_complete(interview)
+
+    if not confirmations_complete:
+        # Still have unconfirmed fields - stay in interview phase
+        return {
+            "missing_fields": [],
+            "fields_needing_confirmation": unconfirmed,
+        }
+
+    # All complete! Transition to requirements phase
+    # prepare_next_node will display the summary and ask for confirmation
+    return {
+        "phase": "requirements",
+        "missing_fields": [],
+        "fields_needing_confirmation": [],
+    }

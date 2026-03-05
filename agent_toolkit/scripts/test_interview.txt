@@ -1,0 +1,56 @@
+# Basic Interview Test Script
+# Tests the basic interview flow for PD3r
+# Updated 2026-01-16 to match actual agent interview flow
+
+# Start conversation
+Hello, I'd like to create a new position description.
+
+# Check for greeting response
+@EXPECT:Pete
+
+# Confirm we want to create a PD
+Yes, please help me create one.
+
+# Agent asks for position title
+@EXPECT:title
+
+# Provide position title
+IT Specialist
+
+# Agent asks for series code
+@EXPECT:series
+
+# Provide series code
+2210
+
+# Agent asks for grade
+@EXPECT:grade
+
+# Provide grade
+GS-13
+
+# Agent asks for organization
+@EXPECT:organization
+
+# Provide organization info
+Software Development Branch, Office of Information Technology
+
+# Agent asks for supervisor
+@EXPECT:supervisor
+
+# Provide supervisor info  
+John Smith, IT Supervisor
+
+# Agent asks for work schedule
+@EXPECT:schedule
+
+# Provide schedule
+Full-time permanent
+
+@PAUSE
+
+# At this point the interview should be progressing
+# End the conversation gracefully
+Thank you, that's all the information I have for now.
+
+@END

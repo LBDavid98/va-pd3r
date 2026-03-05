@@ -1,0 +1,46 @@
+# Long Conversation Test
+# Tests multi-turn conversation handling
+
+# Phase 1: Initial setup
+Hello, I want to create a position description for an IT Specialist role.
+
+# Answer questions in sequence
+It's a GS-13 position in the Office of Information Technology
+
+@WAIT:1
+
+The position is full-time permanent
+
+@WAIT:1
+
+This role focuses on cybersecurity operations
+
+@WAIT:1
+
+# More details
+The employee will analyze security threats and implement protective measures
+
+@WAIT:1
+
+They need experience with NIST frameworks and FedRAMP
+
+@WAIT:1
+
+# Supervisor info
+The supervisor is Jane Doe, jane.doe@agency.gov
+
+@PAUSE
+
+# Continue through more of the interview
+The position requires a security clearance at the Secret level
+
+@WAIT:1
+
+The duty station is Washington, DC
+
+@WAIT:1
+
+# Wrap up interview section
+I think that covers all the main points
+
+@END

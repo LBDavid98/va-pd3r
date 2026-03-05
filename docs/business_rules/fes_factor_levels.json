@@ -1,0 +1,396 @@
+{
+  "fes_factorLevels": {
+    "1": {
+      "factor_name": "Knowledge",
+      "levels": {
+        "1-1": {
+          "does": [
+            "Understands very simple office procedures and terminology (e.g., filing, answering phones).",
+            "Knows how to follow straightforward instructions."
+          ]
+        },
+        "1-2": {
+          "does": [
+            "Understands very simple office procedures and terminology (e.g., filing, answering phones).",
+            "Knows how to follow straightforward instructions.",
+            "Uses basic office software (word processors, spreadsheets) through menu commands; knowledge is limited to simple commands and templates.",
+            "Knows routine clerical procedures such as logging forms, routing mail, or checking documents for completeness.",
+            "May perform data entry or file maintenance using a single system."
+          ]
+        },
+        "1-3": {
+          "does": [
+            "Understands very simple office procedures and terminology (e.g., filing, answering phones).",
+            "Knows how to follow straightforward instructions.",
+            "Uses basic office software (word processors, spreadsheets) through menu commands; knowledge is limited to simple commands and templates.",
+            "Knows routine clerical procedures such as logging forms, routing mail, or checking documents for completeness.",
+            "May perform data entry or file maintenance using a single system.",
+            "Applies a standardized body of regulations and procedures to carry out recurring tasks like processing forms, screening files, or explaining routine benefits.",
+            "Recognizes multiple, interrelated steps but follows prescribed sequences without needing to adapt procedures.",
+            "Uses one or two automated systems to accomplish tasks (e.g., scanning documents)."
+          ]
+        },
+        "1-4": {
+          "does": [
+            "Understands very simple office procedures and terminology (e.g., filing, answering phones).",
+            "Knows how to follow straightforward instructions.",
+            "Uses basic office software (word processors, spreadsheets) through menu commands; knowledge is limited to simple commands and templates.",
+            "Knows routine clerical procedures such as logging forms, routing mail, or checking documents for completeness.",
+            "May perform data entry or file maintenance using a single system.",
+            "Applies a standardized body of regulations and procedures to carry out recurring tasks like processing forms, screening files, or explaining routine benefits.",
+            "Recognizes multiple, interrelated steps but follows prescribed sequences without needing to adapt procedures.",
+            "Uses one or two automated systems to accomplish tasks (e.g., scanning documents).",
+            "Possesses practical knowledge of multiple automated systems or software packages (e.g., web editors, photo editing, intranet platforms) to manage information; may maintain intranet pages or combine information from different systems.",
+            "Knows organizational policies, structure and administrative procedures; able to coordinate across offices and track status.",
+            "Applies well-defined methods to gather information and prepare products such as reports, budgets, or schedules; uses off-the-shelf tools rather than creating software."
+          ]
+        },
+        "1-5": {
+          "does": [
+            "Understands very simple office procedures and terminology (e.g., filing, answering phones).",
+            "Knows how to follow straightforward instructions.",
+            "Uses basic office software (word processors, spreadsheets) through menu commands; knowledge is limited to simple commands and templates.",
+            "Knows routine clerical procedures such as logging forms, routing mail, or checking documents for completeness.",
+            "May perform data entry or file maintenance using a single system.",
+            "Applies a standardized body of regulations and procedures to carry out recurring tasks like processing forms, screening files, or explaining routine benefits.",
+            "Recognizes multiple, interrelated steps but follows prescribed sequences without needing to adapt procedures.",
+            "Uses one or two automated systems to accomplish tasks (e.g., scanning documents).",
+            "Possesses practical knowledge of multiple automated systems or software packages to manage information; may maintain intranet pages or combine information from different systems.",
+            "Knows organizational policies, structure and administrative procedures; able to coordinate across offices and track status.",
+            "Applies well-defined methods to gather information and prepare products such as reports, budgets, or schedules.",
+            "Knowledge of a comprehensive body of technical rules and procedures for an administrative specialty (e.g., HR assistant). Able to research, interpret and apply a wide range of guidance to resolve routine problems and answer questions.",
+            "Conducts interviews, analyzes factual information and explains procedural requirements to employees and supervisors.",
+            "Provides advice on minor problems such as processing appeals or rating employees using established criteria."
+          ]
+        },
+        "1-6": {
+          "does": [
+            "Understands very simple office procedures and terminology.",
+            "Knows how to follow straightforward instructions.",
+            "Uses basic office software through menu commands.",
+            "Knows routine clerical procedures and performs data entry or file maintenance.",
+            "Applies a standardized body of regulations and procedures.",
+            "Recognizes multiple, interrelated steps but follows prescribed sequences.",
+            "Uses one or two automated systems to accomplish tasks.",
+            "Possesses practical knowledge of multiple automated systems to manage information; coordinates across offices.",
+            "Applies well-defined methods to gather information and prepare products.",
+            "Possesses knowledge of a comprehensive body of technical rules and procedures and provides advice on minor problems.",
+            "Skilled in applying analytical and evaluative techniques (e.g., literature searches, work measurement, task analysis, productivity charting) to gather and organize factual data.",
+            "Understands management and organizational theory, administrative practices, and basic budget and human resources principles.",
+            "Conducts interviews and observes work processes to identify procedural problems and recommend improvements."
+          ]
+        },
+        "1-7": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Thorough knowledge of laws, regulations, policies, and precedents affecting a major mission function; understands program goals and objectives.",
+            "Plans, schedules and conducts projects to improve program effectiveness and productivity; gathers, analyzes and interprets diverse data and prepares recommendations.",
+            "Adapts analytic techniques and evaluation criteria to study different programs; considers interrelationships among programs and functions.",
+            "Skill in effectively communicating with managers and officials to present findings and gain agreement."
+          ]
+        },
+        "1-8": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Mastery of advanced qualitative and quantitative methods and comprehensive knowledge of administrative laws, policies, and precedent-setting regulations.",
+            "Designs and directs broad, complex or highly sensitive studies; evaluates proposed legislation or agency regulations and recommends major program changes.",
+            "Develops new measurement methods and evaluation criteria and leads multi-disciplinary teams; negotiates with high-level officials on controversial issues.",
+            "Represents the organization in discussions where program or policy developments are formulated."
+          ]
+        }
+      }
+    },
+    "2": {
+      "factor_name": "Supervisory Controls",
+      "levels": {
+        "2-1": {
+          "does": [
+            "Supervisor provides very detailed instructions on assignments and methods; tasks involve simple, repetitive steps.",
+            "Work is closely controlled and checked during and after completion; employee has little or no latitude."
+          ]
+        },
+        "2-2": {
+          "does": [
+            "Supervisor provides very detailed instructions on assignments and methods; tasks involve simple, repetitive steps.",
+            "Work is closely controlled and checked during and after completion.",
+            "Supervisor gives general instructions covering what is to be done, deadlines and priorities; tasks are recurring and well defined.",
+            "Employee uses judgment to complete tasks but refers unfamiliar situations or deviations to supervisor.",
+            "Work is reviewed for accuracy, adherence to instructions and completion of objectives."
+          ]
+        },
+        "2-3": {
+          "does": [
+            "Supervisor provides very detailed instructions and general instructions for recurring tasks.",
+            "Work is closely controlled but employee uses judgment to complete tasks and refers unusual situations to the supervisor.",
+            "Supervisor outlines objectives and sets deadlines but relies on employee to plan and execute work; assignments may be varied and involve analysis or problem solving.",
+            "Employee chooses methods, resolves most problems independently, and informs supervisor of unusual issues.",
+            "Supervisor reviews completed work for consistency with policy and practicality, not step-by-step compliance."
+          ]
+        },
+        "2-4": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Employee and supervisor jointly develop project plans, discussing scope, methods and resources; once agreed, the employee carries out all phases of assignments.",
+            "Supervisor provides administrative guidance (e.g., budget, time frames) but rarely intervenes; employee has latitude to resolve issues.",
+            "Finished work is reviewed for compatibility with organizational goals and policies, not for methodology."
+          ]
+        },
+        "2-5": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Employee receives only administrative direction outlining broad objectives; supervisor trusts the employee to determine approaches, plan projects and set priorities.",
+            "Assignments often involve novel or precedent\u2011setting issues; the employee makes authoritative determinations and exercises full responsibility over analysis and final recommendations.",
+            "Supervisor reviews results only for policy implications or potential impact on the program."
+          ]
+        }
+      }
+    },
+    "3": {
+      "factor_name": "Guidelines",
+      "levels": {
+        "3-1": {
+          "does": [
+            "Uses detailed and specific guidelines, such as standard operating procedures, manuals, and software instructions.",
+            "Steps are clear\u2011cut and cover almost every situation; employee is expected to follow instructions exactly."
+          ]
+        },
+        "3-2": {
+          "does": [
+            "Uses detailed and specific guidelines and follows clear\u2011cut steps.",
+            "Multiple established guidelines (regulations, policy directives, vendor manuals) cover most aspects of the work; employee must select the correct guideline for each case.",
+            "Employee may make minor adjustments to fit specific circumstances but generally does not deviate from instructions.",
+            "Unusual situations or conflicts are referred to the supervisor or a higher authority."
+          ]
+        },
+        "3-3": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Standard references and precedent studies are available but often contain gaps or are not directly applicable to the specific problem.",
+            "Employee researches regulations, adapts or interprets guidelines and determines their interrelationships to solve problems.",
+            "May develop new procedures when existing guidelines do not cover the situation; uses judgment to balance efficiency and compliance."
+          ]
+        },
+        "3-4": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Guidelines consist of general administrative policies and broad management directives that state desired results but not specific methods.",
+            "Employee must research policy intent, adapt and extend guidelines and develop more specific instructions, procedures, or criteria.",
+            "Develops new methods or modifies existing procedures to improve program effectiveness."
+          ]
+        },
+        "3-5": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Guidelines are very general, such as policy statements, legislative histories, and precedent\u2011setting decisions; often ambiguous or contradictory.",
+            "Employee interprets and revises existing policy, formulates new guidance, and drafts policy or regulatory provisions for adoption by top management.",
+            "Serves as an expert authority on guidelines, advising other analysts and management on their interpretation and application."
+          ]
+        }
+      }
+    },
+    "4": {
+      "factor_name": "Complexity",
+      "levels": {
+        "4-1": {
+          "does": [
+            "Work consists of simple, clear\u2011cut and repetitive tasks such as verifying forms, scanning documents or performing data entry.",
+            "Actions follow prescribed steps and require little or no choice in what to do or how to do it."
+          ]
+        },
+        "4-2": {
+          "does": [
+            "Work consists of simple, clear\u2011cut and repetitive tasks.",
+            "Assignments include related procedural steps; employee must choose the correct sequence and apply established methods.",
+            "Decisions involve selecting from among well\u2011established procedures or options based on customer needs or organizational requirements.",
+            "Work may involve searching files, selecting the proper code, or applying standard formulas; there may be some variation in how to proceed."
+          ]
+        },
+        "4-3": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Assignments involve procedural problems where the employee applies analytic techniques to collect and organize data (e.g., task analysis, workload measurement).",
+            "Work requires selecting from a variety of established methods and making adjustments to fit specific situations; products include narrative reports and tables.",
+            "Problems are typically factual rather than substantive; decisions depend on comparing data to standards or precedents."
+          ]
+        },
+        "4-4": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Assignments involve substantive or programmatic problems where data are incomplete or conflicting.",
+            "Employee applies qualitative and quantitative analytical techniques, determines the nature of problems, and develops recommendations to improve program effectiveness.",
+            "Requires originality in refining existing methods and interpreting regulations to suit local conditions."
+          ]
+        },
+        "4-5": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Projects address complex, interrelated program or administrative issues that span functions or organizations.",
+            "Employee develops long\u2011range plans, new measurement criteria, and procedures to evaluate program effectiveness or efficiency.",
+            "Assignments may involve evaluating subjective information and conflicting objectives; recommendations influence major programs."
+          ]
+        },
+        "4-6": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Assignments involve extremely broad and undefined program issues; studies often affect multiple agencies, national policies or public programs.",
+            "Employee leads teams of subject\u2011matter experts to develop new concepts, translate legislative or regulatory intent into programs, and evaluate the impact of proposed policies.",
+            "Requires creating new ways to measure and implement programs and developing long\u2011range strategic plans that significantly redirect Federal efforts."
+          ]
+        }
+      }
+    },
+    "5": {
+      "factor_name": "Scope and Effect",
+      "levels": {
+        "5-1": {
+          "does": [
+            "Work consists of repetitive or strictly defined tasks such as maintaining records, entering data or distributing information.",
+            "Products primarily facilitate the work of colleagues within the immediate office and have little impact beyond the unit."
+          ]
+        },
+        "5-2": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Assignments involve collecting and disseminating information or administering processes (e.g., verifying forms, scheduling tests) that affect the timeliness and accuracy of administrative operations.",
+            "Work products contribute to the convenience of operations but do not influence policies or change program effectiveness."
+          ]
+        },
+        "5-3": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Projects improve efficiency and productivity of administrative support; employee identifies problems, collects data and provides recommendations.",
+            "Reports influence managers' decisions and may change how resources or services are delivered but do not include evaluation of program effectiveness or the overall mission.",
+            "Scope typically is limited to internal administrative functions or portions of broader studies."
+          ]
+        },
+        "5-4": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Work assesses productivity and effectiveness of program operations, not just administrative support.",
+            "Develops criteria to measure achievement of program goals and recommends improvements that may affect multiple organizational levels or cooperating agencies.",
+            "Recommendations are adopted by managers and have a direct and lasting impact on mission delivery."
+          ]
+        },
+        "5-5": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Assignments involve analysis and resolution of major administrative aspects of mission\u2011oriented programs.",
+            "Work leads to development of new program regulations, policies, or evaluation criteria and may affect large segments of society or multiple agencies.",
+            "Recommendations cause significant changes in program operations and resource allocations across a bureau or region."
+          ]
+        },
+        "5-6": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Work encompasses very broad studies and recommendations that realign responsibilities across programs or agencies, often influencing national policy.",
+            "Assignments address issues of such scope that they change legislation, program structure, or federal approaches; may involve inter\u2011agency coordination and public impact.",
+            "Outcomes may significantly redirect Federal resources and programs."
+          ]
+        }
+      }
+    },
+    "6": {
+      "factor_name": "Personal Contacts",
+      "levels": {
+        "1": {
+          "does": [
+            "Contacts are within the immediate office or work group (e.g., coworkers, supervisor).",
+            "Purpose is to exchange routine information or receive assignments."
+          ]
+        },
+        "2": {
+          "does": [
+            "Contacts are within the immediate office or work group.",
+            "Purpose is to exchange routine information or receive assignments.",
+            "Contacts are with employees of the same agency or recurring business contacts outside the agency, such as vendors or local contractors.",
+            "May also involve contacts with the public to obtain or provide factual information."
+          ]
+        },
+        "3": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Contacts include program officials several managerial levels away, consultants, contractors, or representatives of other agencies or community organizations.",
+            "Contacts may occur in formal settings such as committees or working groups.",
+            "The people contacted typically have decision\u2011making authority or specialized knowledge needed for the project."
+          ]
+        },
+        "4": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Contacts are with top\u2011level agency officials, major program executives, key staff of legislative or judicial bodies, or corporate presidents.",
+            "The contacts typically involve those who have the authority to set policy or commit resources."
+          ]
+        }
+      }
+    },
+    "7": {
+      "factor_name": "Purpose of Contacts",
+      "levels": {
+        "a": {
+          "does": [
+            "Contacts are to obtain, clarify, or provide factual information, such as exchanging status updates, explaining procedures, or answering routine questions.",
+            "There is no attempt to influence the other party's opinions or decisions."
+          ]
+        },
+        "b": {
+          "does": [
+            "Contacts are to obtain, clarify or provide factual information.",
+            "Provides advice, guidance, or limited training, such as explaining administrative procedures, HR policies, or program processes to employees or supervisors.",
+            "May resolve routine problems or answer technical questions; the contacts may require using tact and diplomacy to explain reasons for policies."
+          ]
+        },
+        "c": {
+          "does": [
+            "Contacts are to obtain, clarify or provide factual information and to offer advice or limited training.",
+            "Contacts are to influence, persuade, or motivate managers, officials, or contractors to adopt recommendations, change methods, or accept findings.",
+            "Requires skill in negotiation and presentation of arguments; the employee may propose solutions and advocate for their adoption."
+          ]
+        },
+        "d": {
+          "does": [
+            "Contacts are to obtain, clarify or provide factual information, offer advice, and persuade or influence others.",
+            "Contacts are to justify, defend, or settle matters of considerable significance such as major program proposals, contract disputes, or policy changes with officials who have decision\u2011making authority.",
+            "Requires negotiating with parties having opposing viewpoints and often involves compromise to reach agreement."
+          ]
+        }
+      }
+    },
+    "8": {
+      "factor_name": "Physical Demands",
+      "levels": {
+        "8-1": {
+          "does": [
+            "Work is primarily sedentary; employee sits at a desk or computer most of the time.",
+            "May require occasional walking, standing, or carrying light items such as folders or pamphlets.",
+            "Requires no special physical effort."
+          ]
+        },
+        "8-2": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Work requires long periods of standing, bending, or stooping to observe work operations or perform tasks such as filing and mail handling.",
+            "May involve moderate physical exertion, including lifting and carrying packages, mail trays, or boxes."
+          ]
+        }
+      }
+    },
+    "9": {
+      "factor_name": "Work Environment",
+      "levels": {
+        "9-1": {
+          "does": [
+            "Work is performed in a typical office setting that is adequately lighted, heated, and ventilated.",
+            "Involves everyday safety risks requiring normal precautions; no special safety equipment is needed."
+          ]
+        },
+        "9-2": {
+          "does": [
+            "<REF_PRIOR_LEVEL_DUTIES>",
+            "Duties include regular visits to manufacturing, industrial or mail\u2011processing areas where there may be moving machinery, loud noise or other hazards.",
+            "Employee uses protective clothing or safety equipment when needed and exercises extra safety precautions."
+          ]
+        }
+      }
+    }
+  }
+}

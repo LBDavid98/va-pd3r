@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "langgraph Docs": {
+      "type": "sse",
+      "url": "https://gitmcp.io/langchain-ai/langgraph"
+    }
+  }
+}
