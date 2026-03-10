@@ -290,8 +290,6 @@ def gather_draft_requirements_node(state: AgentState) -> dict:
             "",
             f"I'll draft each section one at a time for your review. "
             f"That's **{len(draft_elements)} sections** total.",
-            "",
-            f"Let's start with the **{start_element.display_name}**...",
         ])
     else:
         preamble_lines.append("\nNo draft sections found.")
@@ -305,7 +303,7 @@ def gather_draft_requirements_node(state: AgentState) -> dict:
         "current_element_index": start_index,
         "current_element_name": start_element.name if start_element else None,
         "phase": "drafting",
-        "next_prompt": f"Drafting the {start_element.display_name}..." if start_element else "",
+        "next_prompt": "",
     }
 
 

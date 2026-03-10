@@ -69,7 +69,7 @@ def handle_draft_response_node(state: AgentState) -> dict:
             action_msg = (
                 f"Review: {next_element.display_name}"
                 if already_reviewed
-                else f"Let me draft the {next_element.display_name}..."
+                else ""
             )
             return {
                 "messages": [
@@ -118,11 +118,11 @@ def handle_draft_response_node(state: AgentState) -> dict:
             return {
                 "messages": [
                     AIMessage(
-                        content=f"{get_revision_acknowledgment()} Let me revise the {element.display_name}."
+                        content=f"{get_revision_acknowledgment()} I'll revise **{element.display_name}** based on your feedback."
                     )
                 ],
                 "draft_elements": draft_elements,
-                "next_prompt": "Revising...",
+                "next_prompt": "",
             }
         else:
             return {
@@ -198,5 +198,5 @@ def advance_to_next_element_node(state: AgentState) -> dict:
                 content=f"Moving to: {next_element.display_name}"
             )
         ],
-        "next_prompt": f"Drafting {next_element.display_name}...",
+        "next_prompt": "",
     }

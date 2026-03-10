@@ -13,44 +13,21 @@ const TYPING_TIMEOUT = 90_000 // Safety: clear typing indicator after 90s of no 
 /**
  * Classify agent messages to reduce chat noise during drafting/review.
  *
- * With structured activity_update messages providing real-time agent
- * visibility, this filter only needs to catch:
+ * With structured activity_update messages (Phase 3) and node prompt
+ * cleanup (Phase 3.4), this filter only catches edge cases:
  *   1. Draft content leaked into chat (belongs in ProductPanel)
- *   2. Internal pipeline chatter (transitions, QA details, prompts)
- *   3. FES evaluation noise (shown in ProductPanel instead)
- *
- * All user-initiated action feedback is now handled by element_update
- * and activity_update WebSocket messages — no need for regex here.
+ *   2. Approval prompts (handled by ProductPanel buttons)
  */
 function classifyAgentMessage(content: string): { action: "show" | "system" | "suppress"; replacement?: string } {
   const lower = content.toLowerCase()
-  const trimmed = content.trim()
-
-  // FES evaluation detail — shown in ProductPanel, not chat
-  if (lower.includes("fes evaluation complete") || (lower.includes("total points") && lower.includes("factor"))) {
-    return { action: "suppress" }
-  }
 
   // Draft content leaked into chat (long content with markdown delimiters)
   if (content.includes("\n---\n") && content.length > 500) {
     return { action: "suppress" }
   }
 
-  // Internal pipeline messages — short status lines the activity indicator replaces
-  if (/^(drafting|running qa|revising|reviewing|moving to)\s/i.test(trimmed) && trimmed.length < 80) {
-    return { action: "suppress" }
-  }
-  if (/let me (draft|revise|rewrite)/i.test(lower)) {
-    return { action: "suppress" }
-  }
-
-  // Interrupt prompts — approval handled by ProductPanel buttons
+  // Approval prompts — handled by ProductPanel buttons, not chat
   if (lower.includes("do you approve")) {
-    return { action: "suppress" }
-  }
-
-  // Emoji-prefixed pipeline noise
-  if (/^(\u{1F4DD}|\u2705|\u2713)\s/u.test(trimmed)) {
     return { action: "suppress" }
   }
 

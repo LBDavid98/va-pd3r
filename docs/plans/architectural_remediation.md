@@ -386,8 +386,8 @@ Four architectural problems compound each other:
 - [x] 3.3a Reduced `classifyAgentMessage()` from 138 lines to ~28 lines
 - [x] 3.3b Kept only: content echo, FES detail, pipeline filler, interrupt prompt suppression
 - [x] 3.3c TypeScript clean, 44 Phase 1-3 tests passing
-- [ ] 3.4a Audit node messages — identify internal vs user-facing (gradual)
-- [ ] 3.4b Replace internal messages with activity signals (node by node, gradual)
+- [x] 3.4a Audit node messages — identified 6 nodes with internal-state next_prompt values
+- [x] 3.4b Cleared internal next_prompt in generate_element, handle_revision, evaluate_fes, gather_requirements, finalize; reduced classifyAgentMessage to ~20 lines
 - [x] 3.4c **Commit checkpoint: "Replace message suppression with structured agent visibility"**
 
 ---

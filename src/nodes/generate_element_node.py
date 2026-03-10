@@ -218,7 +218,7 @@ async def generate_element_node(state: AgentState) -> dict:
         return _merge({
             "messages": [AIMessage(content=f"**{primary.display_name}** is ready for review.")],
             "draft_elements": draft_elements,
-            "next_prompt": "Running QA review...",
+            "next_prompt": "",
         })
 
     async def _generate_single(idx: int) -> tuple:
@@ -388,7 +388,7 @@ async def generate_element_node(state: AgentState) -> dict:
     return _merge({
         "messages": messages,
         "draft_elements": draft_elements,
-        "next_prompt": "Running QA review...",
+        "next_prompt": "",
     })
 
 

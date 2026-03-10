@@ -86,24 +86,11 @@ def evaluate_fes_factors_node(state: AgentState) -> dict:
     primary_count = len(fes_evaluation.primary_factors)
     other_count = len(fes_evaluation.other_significant_factors)
 
-    summary_lines = [
-        f"✓ FES evaluation complete for GS-{grade_num}:",
-        f"  • Total points: {fes_evaluation.total_points}",
-        f"  • Primary factors (1-5): {primary_count}",
-        f"  • Other significant factors (6-9): {other_count}",
-        "",
-        "Primary factor levels:",
-    ]
-
-    for factor in fes_evaluation.primary_factors:
-        summary_lines.append(f"  • {factor.factor_name}: Level {factor.level_code}")
-
-    summary_lines.append("")
-    summary_lines.append("Other significant factor levels:")
-    for factor in fes_evaluation.other_significant_factors:
-        summary_lines.append(f"  • {factor.factor_name}: Level {factor.level_code}")
-
-    summary = "\n".join(summary_lines)
+    summary = (
+        f"FES evaluation complete for GS-{grade_num} — "
+        f"{primary_count} primary factors, {other_count} other significant factors, "
+        f"{fes_evaluation.total_points} total points."
+    )
 
     # Compact transient interview fields now that interview is complete
     compaction_updates = compact_after_interview(state)
@@ -112,7 +99,7 @@ def evaluate_fes_factors_node(state: AgentState) -> dict:
         "messages": [AIMessage(content=summary)],
         "fes_evaluation": fes_evaluation.model_dump(),
         "phase": "requirements",
-        "next_prompt": "Now let me gather the draft requirements...",
+        "next_prompt": "",
     }
     result.update(compaction_updates)
     return result

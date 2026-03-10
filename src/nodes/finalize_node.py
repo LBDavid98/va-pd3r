@@ -291,7 +291,7 @@ async def handle_element_revision_request(state: AgentState) -> dict:
         "current_element_index": idx,
         "current_element_name": element.name,
         "phase": "drafting",  # Temporarily back to drafting to regenerate
-        "next_prompt": f"Revising {element.display_name}...",
+        "next_prompt": "",
     }
 
 
