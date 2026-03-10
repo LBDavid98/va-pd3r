@@ -320,6 +320,25 @@ REST calls from frontend:
 
 ---
 
+## Phase 4.5: Architectural Remediation (2026-03-10)
+
+> See [architectural_remediation.md](architectural_remediation.md) for full plan.
+
+Addressed 4 systemic issues discovered during UX polish:
+
+| Phase | What | ADR |
+|-------|------|-----|
+| 1. Decompose `send_message()` | 173-line god method → orchestration + helpers + 2 new modules | [009](../decisions/009-send-message-decomposition.md) |
+| 2. Backend-authoritative status | Eliminate frontend optimistic status; add `element_action` protocol | [010](../decisions/010-backend-authoritative-status.md) |
+| 3. Structured agent visibility | Replace 138-line regex suppression with `activity_update` messages | [011](../decisions/011-structured-agent-visibility.md) |
+| 4. Remove dead code | Audit parallel infra (active, keep); remove unused batch functions | — |
+
+**New files:** `src/api/transforms.py`, `src/api/element_tracker.py`
+**New tests:** 44 tests for transforms, tracker, and structured actions
+**Test count:** 899+ passing
+
+---
+
 ## Phase 4: Polish & Production (1 week)
 
 ### 4.1 Reliability Testing

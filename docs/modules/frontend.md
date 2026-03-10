@@ -1,6 +1,6 @@
 # Frontend Architecture
 
-> Last Updated: 2026-03-05
+> Last Updated: 2026-03-10
 
 React + TypeScript SPA in `frontend/`. Communicates with the backend via WebSocket (primary) and REST (fallback).
 
@@ -40,7 +40,8 @@ App.tsx
 - Session lifecycle: `createSession()`, `resumeSession()`, `restartSession()`, `reset()`
 - Phase tracking: `phase`, `state` (full `SessionState`)
 - Field overrides: `setFieldOverride()` → PATCH backend + local optimistic update
-- WebSocket: `wsSend` callback registered by ChatPanel
+- WebSocket: `wsSend` callback registered by ChatPanel, `wsRef` for structured sends
+- Agent activity: `agentActivity` tracks current agent operation (cleared on `done`)
 - Chat title: auto-generated from position metadata
 
 ### chatStore
@@ -66,12 +67,16 @@ App.tsx
 
 1. **Connect** on session creation → auto-reconnect with exponential backoff (1s → 16s max)
 2. **Ping/pong** every 30s to keep connection alive
-3. **Message classification** (`classifyAgentMessage()`) filters verbose agent output:
-   - `"show"` → normal chat bubble
-   - `"system"` → condensed notification (e.g., "Introduction ready for review")
-   - `"suppress"` → hidden (FES results, drafting preamble, approvals)
-4. **Draft fetch** triggered on `agent_message` or `state_update` during drafting/review phases
-5. **Stale session guard** — messages from previous sessions are ignored
+3. **Message classification** (`classifyAgentMessage()`, ~28 lines) — minimal filter for content already shown elsewhere:
+   - Suppresses draft content leaked into chat (shown in ProductPanel)
+   - Suppresses FES evaluation detail, pipeline filler, interrupt prompts
+   - All other messages shown as normal chat bubbles
+   - See [ADR-011](../decisions/011-structured-agent-visibility.md) for rationale
+4. **Activity tracking** — `activity_update` messages set `agentActivity` on sessionStore; cleared on `done`/`stopped`
+5. **Element updates** — `element_update` messages update draft store (backend authoritative, see [ADR-010](../decisions/010-backend-authoritative-status.md))
+6. **Structured actions** — `element_action` messages sent via raw `wsRef` for approve/reject/regenerate (bypasses LLM classification)
+7. **Draft fetch** triggered on `agent_message` or `state_update` during drafting/review phases
+8. **Stale session guard** — messages from previous sessions are ignored
 
 ## Key Patterns
 
@@ -87,7 +92,7 @@ App.tsx
 pending → drafted → qa_passed → approved
                   → needs_revision → (auto-rewrite) → drafted → ...
 ```
-During active drafting, `needs_revision` is transient (spinner shown instead of amber dot).
+Status is always set by the backend via `element_update` messages. The frontend renders spinners when `agentActivity.element` matches the section name, replacing the old heuristic-based `isAgentProcessing` check.
 
 ### Export Fallback
 When downloading from history and the server session has expired, the frontend builds a markdown file from locally-stored draft elements.

@@ -46,7 +46,7 @@ See [plans/mvp_roadmap.md](plans/mvp_roadmap.md) for current roadmap.
 | Phase 3: React UX | ✅ Complete | Two-panel chat + product layout |
 | Phase 4: UX Polish | ✅ Complete | Drafting fixes, intent classification improvements |
 | Phase 5: Handoff | 🔄 Current | Documentation, cleanup, deployment prep |
-| **Arch Remediation** | 🔄 Planned | [architectural_remediation.md](plans/architectural_remediation.md) |
+| **Arch Remediation** | ✅ Complete | [architectural_remediation.md](plans/architectural_remediation.md) — ADRs [009](decisions/009-send-message-decomposition.md), [010](decisions/010-backend-authoritative-status.md), [011](decisions/011-structured-agent-visibility.md) |
 
 ---
 

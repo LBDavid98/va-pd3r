@@ -58,6 +58,53 @@ ALLOWED EXCEPTIONS:
 See: docs/decisions/006-llm-driven-routing.md, docs/plans/langgraph_migration_plan.md
 ```
 
+## ⛔ NO GOD METHODS POLICY ⛔
+```markdown
+FORBIDDEN:
+- API endpoint handlers >50 lines (extract to helper methods/classes)
+- Methods mixing orchestration with business logic
+- Inline data transformations in streaming loops (extract to transforms module)
+- Duplicate transformation logic (same data → same shape in multiple places)
+
+REQUIRED:
+- API methods orchestrate: validate, delegate, return
+- Business logic lives in dedicated modules (transforms, trackers, etc.)
+- Single source of truth for data transformations
+
+See: docs/decisions/009-send-message-decomposition.md
+```
+
+## ⛔ NO OPTIMISTIC STATUS POLICY ⛔
+```markdown
+FORBIDDEN:
+- Frontend setting element status (approved, needs_revision, etc.) before backend confirms
+- Sending free-text strings ("approve") for structured actions that have dedicated protocols
+- Frontend and backend independently deciding element status
+
+REQUIRED:
+- Element status changes flow: frontend sends intent → backend processes → backend sends element_update → frontend renders
+- Structured actions (approve, reject, regenerate) use element_action WebSocket protocol
+- Frontend may show pending/loading state while waiting for backend confirmation
+
+See: docs/decisions/010-backend-authoritative-status.md
+```
+
+## ⛔ NO MESSAGE SUPPRESSION FOR STATE POLICY ⛔
+```markdown
+FORBIDDEN:
+- Regex-based classification to hide agent state from the user
+- Suppressing agent prompts/questions (user must see what agent is asking)
+- Using chat messages as the transport for internal pipeline state
+
+REQUIRED:
+- Agent internal state communicated via structured activity_update messages
+- Chat messages are conversational (user-facing questions, answers, confirmations)
+- Activity indicators in UI show current agent operation
+- Minimal suppression only for content already shown elsewhere (e.g., draft text in panel)
+
+See: docs/decisions/011-structured-agent-visibility.md
+```
+
 ## Quick Start
 - Install dependencies: `poetry install`
 - Run agent: `poetry run python -m src.main`
@@ -65,20 +112,20 @@ See: docs/decisions/006-llm-driven-routing.md, docs/plans/langgraph_migration_pl
 - Analyze trace: `poetry run python scripts/analyze_trace.py --trace output/logs/<trace>.jsonl`
 - Tests: `poetry run pytest -q`
 
-## Current Focus (2026-03-03)
+## Current Focus (2026-03-10)
 ```markdown
-TECH DEBT REMEDIATION → CONTAINERIZATION → UX
+ARCHITECTURAL REMEDIATION COMPLETE → HANDOFF PREP
 
-Phase 1 (in progress): Technical debt cleanup
-- Deprecated code removed, imports consolidated to src/config/
-- Async patterns standardized via src/utils/async_compat.py
-- State compaction wired into graph transitions
-- Hallucination guards added to RAG/QA prompts
+Completed:
+- Phase 1-4 of MVP roadmap (tech debt, API, UX, polish)
+- Architectural remediation (Phases 1-4):
+  - send_message() decomposed into orchestration + helpers (Phase 1)
+  - Backend-authoritative element status with element_action protocol (Phase 2)
+  - Structured activity_update visibility replacing message suppression (Phase 3)
+  - Dead batch/parallel code removed (Phase 4)
+- 899+ tests passing, TypeScript clean
 
-Phase 2 (next): FastAPI + WebSocket API layer, Docker containerization
-Phase 3: React UX with chat panel + product panel
-
-See: docs/plans/mvp_roadmap.md
+See: docs/plans/mvp_roadmap.md, docs/plans/architectural_remediation.md
 ```
 
 ## Testing Phase Controls

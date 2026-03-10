@@ -1,8 +1,16 @@
 # API Reference
 
-> Last Updated: 2026-03-05
+> Last Updated: 2026-03-10
 
-FastAPI application serving the PD3r agent. Source: `src/api/app.py`, `src/api/websocket.py`, `src/api/models.py`.
+FastAPI application serving the PD3r agent.
+
+**Source files:**
+- `src/api/app.py` — FastAPI app with REST endpoints
+- `src/api/websocket.py` — WebSocket handler for streaming chat
+- `src/api/models.py` — Request/Response Pydantic models
+- `src/api/session_manager.py` — SessionManager wrapping LangGraph graph (orchestration only, see [ADR-009](../decisions/009-send-message-decomposition.md))
+- `src/api/transforms.py` — Data transformations (QA review → frontend summary)
+- `src/api/element_tracker.py` — Element change detection with SHA256 hashing
 
 ## Base URL
 
@@ -68,6 +76,7 @@ FastAPI application serving the PD3r agent. Source: `src/api/app.py`, `src/api/w
 | Type | Data | Description |
 |------|------|-------------|
 | `user_message` | `{ content: string, field_overrides?: object }` | Send user input to the agent. |
+| `element_action` | `{ element: string, action: "approve"\|"reject"\|"regenerate", feedback?: string }` | Structured element action — bypasses LLM intent classification. See [ADR-010](../decisions/010-backend-authoritative-status.md). |
 | `stop` | — | Cancel in-flight processing. |
 | `ping` | — | Keep-alive ping (client sends every 30s). |
 
@@ -77,7 +86,9 @@ FastAPI application serving the PD3r agent. Source: `src/api/app.py`, `src/api/w
 |------|------|-------------|
 | `agent_message` | `{ content, phase?, prompt?, current_field?, missing_fields? }` | Agent response text. `prompt` indicates an interrupt waiting for user input. |
 | `state_update` | `SessionState` (partial) | Updated session state after processing completes. |
-| `element_update` | `{ name, status, content? }` | Individual draft element status change (defined but not currently sent — elements are fetched via REST). |
+| `element_update` | `{ name, status, content?, qa_review? }` | Individual draft element status/content change. Backend is authoritative — see [ADR-010](../decisions/010-backend-authoritative-status.md). |
+| `activity_update` | `{ activity: string, element?: string, detail?: string }` | Agent activity indicator. Activities: `"drafting"`, `"reviewing"`, `"waiting_for_approval"`, `"revising"`, `"evaluating"`. See [ADR-011](../decisions/011-structured-agent-visibility.md). |
+| `done` | — | Signals processing complete; client clears typing indicator and activity. |
 | `stopped` | `SessionState` or `{}` | Acknowledgement that processing was cancelled. |
 | `error` | `{ message: string }` | Error during processing. |
 | `pong` | — | Response to client ping. |
@@ -88,8 +99,16 @@ FastAPI application serving the PD3r agent. Source: `src/api/app.py`, `src/api/w
 Client                          Server
   |--- user_message ------------->|
   |                               |  (graph runs)
+  |<--- activity_update ----------|  (agent working on element)
   |<--- agent_message ------------|  (0..N agent messages)
+  |<--- element_update -----------|  (element status/content change)
   |<--- state_update -------------|  (final state snapshot)
+  |<--- done ---------------------|  (processing complete)
+  |                               |
+  |--- element_action ----------->|  (structured approve/reject/regenerate)
+  |<--- activity_update ----------|
+  |<--- element_update -----------|
+  |<--- done ---------------------|
   |                               |
   |--- ping ---------------------->|
   |<--- pong ---------------------|

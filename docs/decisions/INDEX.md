@@ -1,6 +1,6 @@
 # Architecture Decision Records Index
 
-> **Last Updated**: 2026-03-03
+> **Last Updated**: 2026-03-10
 
 ---
 
@@ -14,6 +14,9 @@
 | [006](006-llm-driven-routing.md) | LLM-Driven Routing (No Heuristics) | Active |
 | [007](007-no-heuristic-decisions.md) | No Heuristic Decision Making | Accepted |
 | [008](008-qa-content-caching.md) | QA Content Caching | Accepted |
+| [009](009-send-message-decomposition.md) | send_message() Decomposition | Accepted |
+| [010](010-backend-authoritative-status.md) | Backend-Authoritative Element Status | Accepted |
+| [011](011-structured-agent-visibility.md) | Structured Agent Visibility | Accepted |
 
 ---
 

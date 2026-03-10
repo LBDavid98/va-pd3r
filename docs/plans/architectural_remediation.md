@@ -570,19 +570,20 @@ See: docs/decisions/011-structured-agent-visibility.md
 
 ### Phase 5 Punch List
 
-- [ ] 5.1a Write ADR-009 (send_message decomposition)
-- [ ] 5.1b Write ADR-010 (backend-authoritative status)
-- [ ] 5.1c Write ADR-011 (structured agent visibility)
-- [ ] 5.2a Add NO GOD METHODS policy to CLAUDE.md
-- [ ] 5.2b Add NO OPTIMISTIC STATUS policy to CLAUDE.md
-- [ ] 5.2c Add NO MESSAGE SUPPRESSION FOR STATE policy to CLAUDE.md
-- [ ] 5.3a Update docs/modules/api.md
-- [ ] 5.3b Update docs/modules/frontend.md
-- [ ] 5.3c Update docs/modules/nodes.md
-- [ ] 5.3d Update docs/INDEX.md
-- [ ] 5.4a Update auto-memory MEMORY.md
-- [ ] 5.5a Update mvp_roadmap.md
-- [ ] 5.5b **Commit checkpoint: "Document architectural policies to prevent regression"**
+- [x] 5.1a Write ADR-009 (send_message decomposition)
+- [x] 5.1b Write ADR-010 (backend-authoritative status)
+- [x] 5.1c Write ADR-011 (structured agent visibility)
+- [x] 5.2a Add NO GOD METHODS policy to CLAUDE.md
+- [x] 5.2b Add NO OPTIMISTIC STATUS policy to CLAUDE.md
+- [x] 5.2c Add NO MESSAGE SUPPRESSION FOR STATE policy to CLAUDE.md
+- [x] 5.3a Update docs/modules/api.md (new files, protocol additions)
+- [x] 5.3b Update docs/modules/frontend.md (activity, element_action, status lifecycle)
+- [x] 5.3c Update docs/decisions/INDEX.md (ADRs 009-011)
+- [x] 5.3d Update docs/INDEX.md (arch remediation → complete)
+- [x] 5.4a Update auto-memory MEMORY.md (architectural policies section)
+- [x] 5.5a Update mvp_roadmap.md (Phase 4.5 section)
+- [x] 5.5b Update CLAUDE.md Current Focus section
+- [ ] 5.5c **Commit checkpoint: "Document architectural policies to prevent regression"**
 
 ---
 
