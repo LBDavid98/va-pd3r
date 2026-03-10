@@ -45,7 +45,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "description": "Opening narrative summarizing role context and organizational placement",
         "requires": ["position_title", "organization_hierarchy", "reports_to", "mission_text"],
         "style": "narrative",
-        "batch": "introduction_duties",
         "prompt_key": "INTRO_PROMPT",
         "generation_tier": "llm",
     },
@@ -53,7 +52,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "description": "Background section describing the organizational unit's mission, the position's purpose within the organization, the series classification context, and the grade level. Do NOT include percentage-weighted duty breakdowns — those belong in Major Duties. Focus on WHY this position exists and HOW it fits into the organization's mission.",
         "requires": ["organization_hierarchy", "position_title", "series", "grade"],
         "style": "narrative",
-        "batch": "introduction_duties",
         "prompt_key": "BACKGROUND_PROMPT",
         "generation_tier": "llm",
     },
@@ -61,7 +59,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "description": "Major duties and responsibilities overview",
         "requires": ["major_duties", "daily_activities"],
         "style": "narrative",
-        "batch": "introduction_duties",
         "prompt_key": "MAJOR_DUTIES_PROMPT",
         "generation_tier": "llm",
     },
@@ -70,7 +67,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "requires": ["factor_targets", "factor_context"],
         "style": "factor_narrative",
         "factor_id": "1",
-        "batch": "fes_factors",
         "prompt_key": "FACTOR_PROMPT",
         "generation_tier": "llm",
     },
@@ -79,7 +75,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "requires": ["factor_targets", "factor_context"],
         "style": "factor_narrative",
         "factor_id": "2",
-        "batch": "fes_factors",
         "prompt_key": "FACTOR_PROMPT",
         "generation_tier": "llm",
     },
@@ -88,7 +83,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "requires": ["factor_targets", "factor_context"],
         "style": "factor_narrative",
         "factor_id": "3",
-        "batch": "fes_factors",
         "prompt_key": "FACTOR_PROMPT",
         "generation_tier": "llm",
     },
@@ -97,7 +91,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "requires": ["factor_targets", "factor_context"],
         "style": "factor_narrative",
         "factor_id": "4",
-        "batch": "fes_factors",
         "prompt_key": "FACTOR_PROMPT",
         "generation_tier": "llm",
     },
@@ -106,7 +99,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "requires": ["factor_targets", "factor_context"],
         "style": "factor_narrative",
         "factor_id": "5",
-        "batch": "fes_factors",
         "prompt_key": "FACTOR_PROMPT",
         "generation_tier": "llm",
     },
@@ -115,7 +107,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "requires": ["factor_targets", "factor_context"],
         "style": "factor_narrative",
         "factor_id": "6_7",
-        "batch": "fes_factors",
         "prompt_key": "FACTOR_6_7_PROMPT",
         "generation_tier": "llm",
     },
@@ -125,7 +116,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "style": "predetermined_narrative",
         "factor_id": "8",
         "default_level": "8-1",
-        "batch": "fes_factors",
         "prompt_key": None,
         "generation_tier": "literal",
     },
@@ -135,7 +125,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "style": "predetermined_narrative",
         "factor_id": "9",
         "default_level": "9-1",
-        "batch": "fes_factors",
         "prompt_key": None,
         "generation_tier": "literal",
     },
@@ -143,7 +132,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "description": "Other Significant Factors - Customer Service, Security, Safety",
         "requires": [],
         "style": "predetermined_narrative",
-        "batch": "fes_factors",
         "prompt_key": None,
         "generation_tier": "literal",
     },
@@ -154,7 +142,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "description": "GSSG Factor 1 - Program Scope and Effect: describes the scope and impact of the programs supervised, including geographic spread, complexity, and mission criticality",
         "requires": ["f1_program_scope", "supervised_employees"],
         "style": "narrative",
-        "batch": "supervisory_factors",
         "prompt_key": "SUPERVISORY_FACTOR_PROMPT",
         "generation_tier": "llm",
     },
@@ -162,7 +149,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "description": "GSSG Factor 2 - Organizational Setting: describes the organizational level and complexity of the unit supervised, reporting relationships, and the position's place in the hierarchy",
         "requires": ["f2_organizational_setting", "organization_hierarchy"],
         "style": "narrative",
-        "batch": "supervisory_factors",
         "prompt_key": "SUPERVISORY_FACTOR_PROMPT",
         "generation_tier": "llm",
     },
@@ -170,7 +156,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "description": "GSSG Factor 3 - Supervisory and Managerial Authority Exercised: describes the personnel authorities exercised including hiring, performance evaluation, discipline, training, and workload management",
         "requires": ["f3_supervisory_authorities"],
         "style": "narrative",
-        "batch": "supervisory_factors",
         "prompt_key": "SUPERVISORY_FACTOR_PROMPT",
         "generation_tier": "llm",
     },
@@ -178,7 +163,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "description": "GSSG Factor 4 - Personal Contacts: describes the nature, frequency, and purpose of personal contacts in the supervisory role, including contacts with senior officials, external stakeholders, and labor organizations",
         "requires": ["f4_key_contacts"],
         "style": "narrative",
-        "batch": "supervisory_factors",
         "prompt_key": "SUPERVISORY_FACTOR_PROMPT",
         "generation_tier": "llm",
     },
@@ -186,7 +170,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "description": "GSSG Factor 5 - Difficulty of Typical Work Directed: describes the difficulty level and nature of the work performed by subordinates, including the highest grade levels supervised and complexity of assignments",
         "requires": ["f5_subordinate_details", "supervised_employees"],
         "style": "narrative",
-        "batch": "supervisory_factors",
         "prompt_key": "SUPERVISORY_FACTOR_PROMPT",
         "generation_tier": "llm",
     },
@@ -194,7 +177,6 @@ SECTION_REGISTRY: dict[str, dict] = {
         "description": "GSSG Factor 6 - Other Conditions: describes any special or unusual supervisory conditions such as geographic dispersion, shift work, hazardous conditions, or coordination across organizational lines",
         "requires": ["f6_special_conditions"],
         "style": "narrative",
-        "batch": "supervisory_factors",
         "prompt_key": "SUPERVISORY_FACTOR_PROMPT",
         "generation_tier": "llm",
     },
@@ -231,83 +213,11 @@ PREDETERMINED_NARRATIVES = {
 }
 
 
-def get_drafting_batches(intake_answers: dict) -> dict[str, list[str]]:
-    """Get drafting batches for parallel execution."""
-    batches = {
-        "introduction_duties": ["introduction", "background", "duties_overview"],
-        "fes_factors": [
-            "factor_1_knowledge",
-            "factor_2_supervisory_controls",
-            "factor_3_guidelines",
-            "factor_4_complexity",
-            "factor_5_scope_effect",
-            "factor_6_7_contacts",
-            "factor_8_physical_demands",
-            "factor_9_work_environment",
-            "other_significant_factors",
-        ],
-        "supervisory_factors": [
-            "supervisory_factor_1_program_scope",
-            "supervisory_factor_2_organizational_setting",
-            "supervisory_factor_3_authority",
-            "supervisory_factor_4_contacts",
-            "supervisory_factor_5_work_directed",
-            "supervisory_factor_6_other_conditions",
-        ],
-    }
-    return batches
-
-
-def get_sections_by_batch(batch_name: str) -> list[str]:
-    """Get all sections that belong to a specific batch."""
-    return [
-        section_id
-        for section_id, meta in SECTION_REGISTRY.items()
-        if meta.get("batch") == batch_name
-    ]
-
-
 def get_predetermined_narrative(factor_id: str, level: str) -> str:
     """Get predetermined narrative for factors 8 and 9."""
     return PREDETERMINED_NARRATIVES.get(factor_id, {}).get(
         level, f"Narrative for Factor {factor_id} Level {level} not found"
     )
-
-
-def get_drafting_sequence(intake_answers: dict) -> list[str]:
-    """Returns flat sequence of all sections in drafting order."""
-    batches = get_drafting_batches(intake_answers)
-    sequence = []
-    for batch_sections in batches.values():
-        sequence.extend(batch_sections)
-    return sequence
-
-
-DEFAULT_SECTION_ORDER: list[str] = ["introduction", "background", "duties_overview"]
-
-
-def get_prompt_for_section(section_id: str) -> str | None:
-    """Get the prompt key for a specific section."""
-    section_config = SECTION_REGISTRY.get(section_id, {})
-    return section_config.get("prompt_key", None)
-
-
-def get_sections_requiring_llm() -> list[str]:
-    """Get all sections that require LLM processing (have prompt_key)."""
-    return [
-        section_id
-        for section_id, config in SECTION_REGISTRY.items()
-        if config.get("prompt_key") is not None
-    ]
-
-
-def get_sections_by_prompt(prompt_key: str) -> list[str]:
-    """Get all sections that use a specific prompt."""
-    return [
-        section_id
-        for section_id, config in SECTION_REGISTRY.items()
-        if config.get("prompt_key") == prompt_key
-    ]
 
 
 def get_generation_tier(section_id: str) -> GenerationTier:
@@ -336,10 +246,6 @@ __all__ = [
     "GenerationTier",
     "PREDETERMINED_NARRATIVES",
     "get_predetermined_narrative",
-    "get_drafting_batches",
-    "get_drafting_sequence",
-    "get_prompt_for_section",
-    "get_sections_requiring_llm",
     "get_generation_tier",
     "get_sections_by_tier",
 ]

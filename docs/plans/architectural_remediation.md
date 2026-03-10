@@ -394,7 +394,9 @@ Four architectural problems compound each other:
 
 ## Phase 4: Simplify Sequential Flow
 
-**Goal:** Remove parallel-like infrastructure that doesn't serve the actual sequential element processing flow. Reduce complexity in element tracking and streaming.
+**Goal:** Remove dead batch/parallel infrastructure while preserving the active parallel execution that provides real speedup.
+
+**Audit finding:** The `asyncio.gather()` calls in `generate_element_node.py` and `qa_review_node.py` are ACTIVE and beneficial — they run literal-tier and LLM-tier sections in true parallel. The QA semaphore prevents rate-limiting. The prerequisite graph enforces correct generation order. Only the batch configuration functions and metadata were dead code.
 
 ### 4.1 Audit Parallel Infrastructure
 
@@ -459,14 +461,15 @@ Four architectural problems compound each other:
 
 ### Phase 4 Punch List
 
-- [ ] 4.1a Document all parallel patterns in codebase
-- [ ] 4.1b For each pattern, document: needed for sequential? what breaks if removed?
-- [ ] 4.2a Simplify `ElementChangeTracker` to track only current element
-- [ ] 4.2b Remove checkpoint pre-population (if Phase 2 complete)
-- [ ] 4.2c Test element streaming with simplified tracker
-- [ ] 4.3a Remove identified dead parallel code paths (one at a time)
-- [ ] 4.3b Test after each removal
-- [ ] 4.3c **Commit checkpoint: "Simplify element streaming for sequential flow"**
+- [x] 4.1a Audit all parallel patterns — `asyncio.gather` in generation & QA is ACTIVE and beneficial (real parallelism)
+- [x] 4.1b Assessment: parallel generation/QA keeps, semaphore keeps, prerequisite graph keeps
+- [x] 4.2 `ElementChangeTracker` already correct for parallel results (iterates all elements) — no simplification needed
+- [x] 4.3a Removed dead batch functions: `get_drafting_batches()`, `get_sections_by_batch()`, `get_drafting_sequence()`
+- [x] 4.3b Removed dead utility functions: `get_prompt_for_section()`, `get_sections_requiring_llm()`, `get_sections_by_prompt()`, `DEFAULT_SECTION_ORDER`
+- [x] 4.3c Removed unused `"batch"` metadata key from all 18 SECTION_REGISTRY entries
+- [x] 4.3d Updated `__all__` export list to match
+- [x] 4.3e Full suite: 899 tests passing, tsc clean
+- [ ] 4.3f **Commit checkpoint: "Remove dead batch/parallel code from drafting config"**
 
 ---
 
