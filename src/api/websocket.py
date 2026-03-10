@@ -25,6 +25,8 @@ async def websocket_chat(websocket: WebSocket, session_id: str, manager: Session
         Client sends: {"type": "ping"}
         Server sends: {"type": "agent_message", "data": {"content": "...", "phase": "...", "prompt": "..."}}
         Server sends: {"type": "state_update", "data": {...session state...}}
+        Server sends: {"type": "element_update", "data": {"name": "...", "status": "...", ...}}
+        Server sends: {"type": "activity_update", "data": {"activity": "drafting|reviewing|...", "element": "...", "detail": "..."}}
         Server sends: {"type": "done"}  — signals processing complete; client should stop typing indicator
         Server sends: {"type": "stopped", "data": {...session state...}}
         Server sends: {"type": "error", "data": {"message": "..."}}
@@ -64,11 +66,18 @@ async def websocket_chat(websocket: WebSocket, session_id: str, manager: Session
                     "data": element_data,
                 })
 
+            async def stream_activity(activity_data: dict):
+                await websocket.send_json({
+                    "type": "activity_update",
+                    "data": activity_data,
+                })
+
             result = await manager.send_message(
                 session_id, content, field_overrides=field_overrides,
                 on_message=stream_message,
                 on_state=stream_state,
                 on_element_update=stream_element,
+                on_activity=stream_activity,
             )
 
             # Send any remaining messages not already streamed

@@ -375,21 +375,20 @@ Four architectural problems compound each other:
 
 ### Phase 3 Punch List
 
-- [ ] 3.1a Define `activity_update` WebSocket message type in protocol docs
-- [ ] 3.1b Add `on_activity` callback to `send_message()` signature
-- [ ] 3.1c Emit activity updates in `_stream_graph()` at node boundaries
-- [ ] 3.1d Add `activity_update` handler to `websocket.py`
-- [ ] 3.2a Add activity state to frontend store
-- [ ] 3.2b Add `activity_update` handler to `useWebSocket.ts`
-- [ ] 3.2c Render per-element activity in ProductPanel
-- [ ] 3.2d Render global activity in chat header or status bar
-- [ ] 3.3a Audit `classifyAgentMessage()` — categorize each rule as "keep" or "remove"
-- [ ] 3.3b Remove rules for patterns now handled by activity_update
-- [ ] 3.3c Test: all agent states visible to user, no invisible loops
-- [ ] 3.4a Audit node messages — identify internal vs user-facing
-- [ ] 3.4b Replace internal messages with activity signals (node by node)
-- [ ] 3.4c Run full test suite after each node change
-- [ ] 3.4d **Commit checkpoint: "Replace message suppression with structured agent visibility"**
+- [x] 3.1a Define `activity_update` WebSocket message type in protocol docs
+- [x] 3.1b Add `on_activity` callback to `send_message()` signature
+- [x] 3.1c Emit activity updates in `_stream_graph()` at node boundaries
+- [x] 3.1d Add `activity_update` handler to `websocket.py`
+- [x] 3.2a Add `agentActivity` state + `setAgentActivity` to `sessionStore.ts`
+- [x] 3.2b Add `activity_update` handler to `useWebSocket.ts` (+ clear on done/stopped)
+- [x] 3.2c Render per-element activity in ProductPanel (spinner + label)
+- [x] 3.2d Status dot now uses structured `activity` prop instead of `isAgentProcessing` heuristic
+- [x] 3.3a Reduced `classifyAgentMessage()` from 138 lines to ~28 lines
+- [x] 3.3b Kept only: content echo, FES detail, pipeline filler, interrupt prompt suppression
+- [x] 3.3c TypeScript clean, 44 Phase 1-3 tests passing
+- [ ] 3.4a Audit node messages — identify internal vs user-facing (gradual)
+- [ ] 3.4b Replace internal messages with activity signals (node by node, gradual)
+- [ ] 3.4c **Commit checkpoint: "Replace message suppression with structured agent visibility"**
 
 ---
 

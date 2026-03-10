@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/tooltip"
 import { ExportBar } from "./ExportBar"
 import { cn } from "@/lib/utils"
-import type { DraftElementSummary, QACheckSummary, ElementAction } from "@/types/api"
+import type { DraftElementSummary, QACheckSummary, ElementAction, AgentActivity } from "@/types/api"
 
 // Default target word counts — mirrors backend TARGET_WORD_COUNTS in drafting_sections.py
 const DEFAULT_TARGET_WORD_COUNTS: Record<string, number> = {
@@ -115,6 +115,7 @@ const SUPERVISORY_SECTIONS = [
 export function ProductPanel() {
   const elements = useDraftStore((s) => s.elements)
   const state = useSessionStore((s) => s.state)
+  const agentActivity = useSessionStore((s) => s.agentActivity)
   const pendingOverrides = useSessionStore((s) => s.pendingFieldOverrides)
   // Merge pending overrides so the document header reflects edits immediately
   const vals = { ...(state?.interview_data_values ?? {}), ...pendingOverrides }
@@ -141,6 +142,7 @@ export function ProductPanel() {
           {/* Draft sections */}
           {sections.map((sec) => {
             const el = contentMap.get(sec.name)
+            const sectionActivity = agentActivity?.element === sec.name ? agentActivity.activity : null
             return (
               <DraftSection
                 key={sec.name}
@@ -148,6 +150,7 @@ export function ProductPanel() {
                 displayName={sec.display}
                 element={el}
                 targetWordCount={wordCountTargets[sec.name] ?? 0}
+                activity={sectionActivity}
               />
             )
           })}
@@ -158,17 +161,27 @@ export function ProductPanel() {
   )
 }
 
+const ACTIVITY_LABELS: Record<AgentActivity, string> = {
+  drafting: "Drafting...",
+  reviewing: "Reviewing...",
+  waiting_for_approval: "Awaiting approval",
+  revising: "Revising...",
+  evaluating: "Evaluating...",
+}
+
 /** A single draft section with collapsible toolbar: QA report, notes, and controls. */
 function DraftSection({
   sectionName,
   displayName,
   element,
   targetWordCount,
+  activity,
 }: {
   sectionName: string
   displayName: string
   element: DraftElementSummary | undefined
   targetWordCount: number
+  activity: AgentActivity | null
 }) {
   const [expanded, setExpanded] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -277,17 +290,12 @@ function DraftSection({
     return "text-amber-600"
   })()
 
-  // Determine a small status dot for the header.
-  // During active drafting, "needs_revision" is transient (auto-rewrite pending),
-  // so show a spinner instead of a static amber dot. In review phase, amber is
-  // meaningful because the user must act.
-  const isAgentProcessing = phase === "drafting" && isTyping
+  // Status dot: use structured activity from backend instead of heuristic.
+  // When this element has active agent work, show a spinner; otherwise static dot.
   const statusDot = (() => {
     if (!element) return null
-    // During active drafting, "drafted" means QA is running and "needs_revision"
-    // means an auto-rewrite is pending — show spinners for both.
-    if ((element.status === "drafted" || element.status === "needs_revision") && isAgentProcessing) {
-      const color = element.status === "drafted" ? "text-blue-400" : "text-amber-400"
+    if (activity) {
+      const color = activity === "revising" ? "text-amber-400" : "text-blue-400"
       return <Loader2 className={`h-3 w-3 animate-spin ${color} shrink-0`} />
     }
     switch (element.status) {
@@ -306,6 +314,11 @@ function DraftSection({
       <div className="flex items-center gap-2 mb-2">
         {statusDot}
         <h2 className="text-base font-semibold flex-1 min-w-0 truncate">{displayName}</h2>
+        {activity && (
+          <span className="text-[10px] text-muted-foreground animate-pulse shrink-0">
+            {ACTIVITY_LABELS[activity]}
+          </span>
+        )}
 
         {/* Word count */}
         {currentTarget > 0 && (

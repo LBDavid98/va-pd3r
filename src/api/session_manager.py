@@ -279,6 +279,7 @@ class SessionManager:
         on_message: Any | None = None,
         on_state: Any | None = None,
         on_element_update: Any | None = None,
+        on_activity: Any | None = None,
     ) -> dict:
         """Send a user message and get the agent's response.
 
@@ -293,6 +294,7 @@ class SessionManager:
             on_message: Optional async callback(str) for real-time AI messages.
             on_state: Optional async callback(dict) for real-time state updates.
             on_element_update: Optional async callback(dict) for element changes.
+            on_activity: Optional async callback(dict) for agent activity updates.
 
         Returns:
             Response dict with agent messages, state, and interrupt data
@@ -323,7 +325,7 @@ class SessionManager:
 
             result, last_streamed_count = await self._stream_graph(
                 session_id, config, content, len(pre_msgs), pre_elements,
-                on_message, on_state, on_element_update,
+                on_message, on_state, on_element_update, on_activity,
             )
 
             unstreamed = self._collect_unstreamed_messages(result, last_streamed_count)
@@ -342,12 +344,21 @@ class SessionManager:
                 if trace_result:
                     logger.info(f"Trace saved: {trace_result[1]}")
 
+    # Map element status → activity type for activity_update messages
+    _STATUS_ACTIVITY_MAP = {
+        "drafted": "reviewing",
+        "qa_passed": "waiting_for_approval",
+        "needs_revision": "revising",
+        "approved": None,  # No ongoing activity for approved
+    }
+
     async def _stream_graph(
         self, session_id: str, config: dict, content: str,
         pre_msg_count: int, pre_elements: list[dict],
-        on_message: Any | None, on_state: Any | None, on_element_update: Any | None,
+        on_message: Any | None, on_state: Any | None,
+        on_element_update: Any | None, on_activity: Any | None,
     ) -> tuple[dict | None, int]:
-        """Stream graph execution, relaying messages and element changes.
+        """Stream graph execution, relaying messages, element changes, and activity.
 
         Returns:
             (final_event, last_streamed_message_count)
@@ -355,6 +366,7 @@ class SessionManager:
         tracker = ElementChangeTracker(pre_elements) if on_element_update else None
         last_streamed_count = pre_msg_count
         result = None
+        prev_element_name: str | None = None
 
         async for event in self._graph.astream(
             Command(resume=content), config, stream_mode="values"
@@ -372,10 +384,43 @@ class SessionManager:
                             await on_state(self._extract_state(session_id, event))
                 last_streamed_count = len(current_msgs)
 
-            # Detect and stream element changes
+            # Detect and stream element changes + derive activity
             if tracker and "draft_elements" in event:
                 for change in tracker.detect_changes(event["draft_elements"]):
                     await on_element_update(tracker.to_dict(change))
+
+                    # Derive activity from element status changes
+                    if on_activity:
+                        activity = self._STATUS_ACTIVITY_MAP.get(change.status)
+                        if activity:
+                            await on_activity({
+                                "activity": activity,
+                                "element": change.display_name,
+                            })
+
+            # Detect when a new element starts being drafted
+            if on_activity:
+                cur_name = event.get("current_element_name")
+                if cur_name and cur_name != prev_element_name:
+                    prev_element_name = cur_name
+                    # Find display name from elements
+                    display = cur_name
+                    for elem in event.get("draft_elements", []):
+                        if isinstance(elem, dict) and elem.get("name") == cur_name:
+                            display = elem.get("display_name", cur_name)
+                            break
+                    await on_activity({
+                        "activity": "drafting",
+                        "element": display,
+                    })
+
+                # Detect phase-based activity
+                phase = event.get("phase")
+                if phase == "requirements" and not event.get("draft_elements"):
+                    await on_activity({
+                        "activity": "evaluating",
+                        "detail": "Evaluating position requirements",
+                    })
 
         return result, last_streamed_count
 

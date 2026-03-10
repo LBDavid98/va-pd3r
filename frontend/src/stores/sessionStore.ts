@@ -13,7 +13,7 @@
  */
 import { create } from "zustand"
 import { toast } from "sonner"
-import type { Phase, SessionState } from "@/types/api"
+import type { Phase, SessionState, AgentActivity } from "@/types/api"
 import * as api from "@/api/client"
 import { useChatStore } from "@/stores/chatStore"
 import { useDraftStore } from "@/stores/draftStore"
@@ -34,6 +34,8 @@ interface SessionStore {
   wsSend: WsSendFn | null
   /** Raw WebSocket reference for structured messages (element_action protocol). */
   wsRef: WebSocket | null
+  /** Current agent activity (cleared on "done"). */
+  agentActivity: { activity: AgentActivity; element?: string; detail?: string } | null
   /** Auto-generated or user-edited chat title */
   chatTitle: string | null
   /** True after user downloads the final document */
@@ -47,6 +49,7 @@ interface SessionStore {
   consumeFieldOverrides: () => Record<string, unknown> | null
   setWsSend: (fn: WsSendFn | null) => void
   setWsRef: (ws: WebSocket | null) => void
+  setAgentActivity: (activity: { activity: AgentActivity; element?: string; detail?: string } | null) => void
   setChatTitle: (title: string) => void
   setDownloaded: (v: boolean) => void
   resumeSession: (id: string) => Promise<boolean>
@@ -65,6 +68,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   pendingFieldOverrides: {},
   wsSend: null,
   wsRef: null,
+  agentActivity: null,
   chatTitle: null,
   downloaded: false,
 
@@ -142,6 +146,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
 
   setWsSend: (fn) => set({ wsSend: fn }),
   setWsRef: (ws) => set({ wsRef: ws }),
+  setAgentActivity: (activity) => set({ agentActivity: activity }),
 
   setChatTitle: (title) => set({ chatTitle: title }),
   setDownloaded: (v) => set({ downloaded: v }),

@@ -126,8 +126,16 @@ export interface WSElementAction {
   feedback?: string
 }
 
+export type AgentActivity = "drafting" | "reviewing" | "waiting_for_approval" | "revising" | "evaluating"
+
+export interface WSActivityUpdate {
+  activity: AgentActivity
+  element?: string
+  detail?: string
+}
+
 export interface WSIncoming {
-  type: "agent_message" | "state_update" | "element_update" | "done" | "stopped" | "error" | "pong"
+  type: "agent_message" | "state_update" | "element_update" | "activity_update" | "done" | "stopped" | "error" | "pong"
   data: Record<string, unknown>
 }
 

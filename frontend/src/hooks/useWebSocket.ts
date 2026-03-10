@@ -3,7 +3,7 @@ import { toast } from "sonner"
 import { useSessionStore } from "@/stores/sessionStore"
 import { useChatStore } from "@/stores/chatStore"
 import { useDraftStore } from "@/stores/draftStore"
-import type { WSIncoming, WSAgentMessage, WSElementUpdate, Phase, ChatMessageType } from "@/types/api"
+import type { WSIncoming, WSAgentMessage, WSElementUpdate, WSActivityUpdate, Phase, ChatMessageType } from "@/types/api"
 
 const PING_INTERVAL = 30_000
 const RECONNECT_BASE = 1_000
@@ -11,126 +11,46 @@ const RECONNECT_MAX = 16_000
 const TYPING_TIMEOUT = 90_000 // Safety: clear typing indicator after 90s of no response
 
 /**
- * Classify agent messages to reduce chat noise during drafting.
+ * Classify agent messages to reduce chat noise during drafting/review.
  *
- * Returns:
- *   "show"     → normal chat bubble (user-facing content)
- *   "system"   → condensed notification (progress, approvals)
- *   "suppress" → hidden entirely (internal plumbing)
+ * With structured activity_update messages providing real-time agent
+ * visibility, this filter only needs to catch:
+ *   1. Draft content leaked into chat (belongs in ProductPanel)
+ *   2. Internal pipeline chatter (transitions, QA details, prompts)
+ *   3. FES evaluation noise (shown in ProductPanel instead)
  *
- * Key principle: anything the user initiated (approve, regenerate) should
- * produce at least a system message so they know it worked.  Internal
- * pipeline messages (QA details, element transitions) can be suppressed.
+ * All user-initiated action feedback is now handled by element_update
+ * and activity_update WebSocket messages — no need for regex here.
  */
 function classifyAgentMessage(content: string): { action: "show" | "system" | "suppress"; replacement?: string } {
   const lower = content.toLowerCase()
   const trimmed = content.trim()
 
-  // --- FES evaluation (requirements phase) ---
+  // FES evaluation detail — shown in ProductPanel, not chat
   if (lower.includes("fes evaluation complete") || (lower.includes("total points") && lower.includes("factor"))) {
     return { action: "suppress" }
   }
-  if (/^(primary|other) (significant )?factor (levels|ratings)/i.test(trimmed)) {
+
+  // Draft content leaked into chat (long content with markdown delimiters)
+  if (content.includes("\n---\n") && content.length > 500) {
     return { action: "suppress" }
   }
 
-  // --- Drafting preamble (internal setup) ---
-  if (lower.includes("ready to start writing") || lower.includes("position description consists of")) {
+  // Internal pipeline messages — short status lines the activity indicator replaces
+  if (/^(drafting|running qa|revising|reviewing|moving to)\s/i.test(trimmed) && trimmed.length < 80) {
     return { action: "suppress" }
   }
-  if (lower.includes("let's start with") || lower.includes("let\u2019s start with")) {
-    return { action: "suppress" }
-  }
-  if (lower.includes("draft each section") || lower.includes("sections total")) {
-    return { action: "suppress" }
-  }
-
-  // --- Batch generation noise ---
-  if (lower.includes("generated draft for") || lower.includes("queued for qa")) {
-    return { action: "suppress" }
-  }
-  if (lower.includes("is ready for review")) {
-    return { action: "suppress" }
-  }
-
-  // --- QA results (internal — QA detail shown in draft panel) ---
-  if (lower.includes("qa review") && lower.includes("requirements passed")) {
-    return { action: "suppress" }
-  }
-  if (lower.includes("this section passed") && lower.includes("approve")) {
-    return { action: "suppress" }
-  }
-
-  // --- Section ready for review (QA passed → user needs to act) ---
-  if (lower.includes("review the section in the draft panel") || lower.includes("review in the draft panel")) {
-    const match = content.match(/\*\*(.+?)\*\*/)
-    const section = match?.[1] ?? "Section"
-    return { action: "system", replacement: `${section} ready for review` }
-  }
-  if ((lower.includes("passed qa review") || lower.includes("requires human review")) && (lower.includes("approve") || lower.includes("review"))) {
-    const match = content.match(/\*\*(.+?)\*\*/)
-    const section = match?.[1] ?? "Section"
-    return { action: "system", replacement: `${section} ready for review` }
-  }
-
-  // --- Section approval confirmations (user-initiated → system message) ---
-  if (lower.includes("approved!") || lower.includes("approved.")) {
-    const match = content.match(/\*\*(.+?)\*\*/)
-    const section = match?.[1] ?? "Section"
-    return { action: "system", replacement: `${section} approved` }
-  }
-
-  // --- "Moving to next section: X" / "Moving to: X" ---
-  if (/moving to(?: next section)?[:\s]/i.test(lower)) {
-    return { action: "suppress" }
-  }
-
-  // --- "Let me draft X" / "Let me revise X" (internal pipeline) ---
   if (/let me (draft|revise|rewrite)/i.test(lower)) {
     return { action: "suppress" }
   }
 
-  // --- "Drafting X..." (next_prompt passthrough) ---
-  if (/^drafting\s/i.test(trimmed) && trimmed.length < 80) {
-    return { action: "suppress" }
-  }
-
-  // --- Revision acknowledgments (user-initiated → system message) ---
-  if (lower.includes("needs revision") && lower.includes("rewriting automatically")) {
-    const match = content.match(/\*\*(.+?)\*\*/)
-    const section = match?.[1] ?? "Section"
-    return { action: "system", replacement: `${section} being revised` }
-  }
-
-  // --- Draft content echoed in chat ---
-  if (lower.includes("review it in the draft panel") || lower.includes("review in the panel")) {
-    const match = content.match(/\*\*(.+?)\*\*/)
-    const section = match?.[1] ?? "Section"
-    return { action: "system", replacement: `${section} drafted` }
-  }
-  // Emoji-prefixed content echo
-  if (/^(📝|✅|✓)\s/.test(trimmed)) {
-    return { action: "suppress" }
-  }
-  // Full draft content leak (contains --- delimiters and is long)
-  if (content.includes("\n---\n") && content.length > 500) {
-    const match = content.match(/\*\*(.+?)\*\*/)
-    const section = match?.[1] ?? "Section"
-    return { action: "system", replacement: `${section} drafted` }
-  }
-
-  // --- Short filler / "X drafted" standalone ---
-  if (/^\w[\w\s:]+drafted\.?$/i.test(trimmed) && trimmed.length < 60) {
-    return { action: "suppress" }
-  }
-
-  // --- "Running QA review..." / "Revising..." next_prompt passthroughs ---
-  if (/^(running qa|revising|reviewing)/i.test(trimmed) && trimmed.length < 60) {
-    return { action: "suppress" }
-  }
-
-  // --- "Do you approve this section?" interrupt prompt ---
+  // Interrupt prompts — approval handled by ProductPanel buttons
   if (lower.includes("do you approve")) {
+    return { action: "suppress" }
+  }
+
+  // Emoji-prefixed pipeline noise
+  if (/^(\u{1F4DD}|\u2705|\u2713)\s/u.test(trimmed)) {
     return { action: "suppress" }
   }
 
@@ -149,6 +69,7 @@ export function useWebSocket(sessionId: string | null) {
   const setConnected = useSessionStore((s) => s.setConnected)
   const setWsRef = useSessionStore((s) => s.setWsRef)
   const updateState = useSessionStore((s) => s.updateState)
+  const setAgentActivity = useSessionStore((s) => s.setAgentActivity)
   const addMessage = useChatStore((s) => s.addMessage)
   const setTyping = useChatStore((s) => s.setTyping)
   const updateElement = useDraftStore((s) => s.updateElement)
@@ -266,16 +187,23 @@ export function useWebSocket(sessionId: string | null) {
             })
             break
           }
+          case "activity_update": {
+            const data = msg.data as unknown as WSActivityUpdate
+            setAgentActivity({ activity: data.activity, element: data.element, detail: data.detail })
+            break
+          }
           case "done": {
             // Single source of truth: backend signals processing complete.
             // This is the ONLY place typing gets turned off during normal flow.
             if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
             setTyping(false)
+            setAgentActivity(null)
             break
           }
           case "stopped": {
             if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
             setTyping(false)
+            setAgentActivity(null)
             addMessage("agent", "Processing stopped.", "system")
             if (msg.data && Object.keys(msg.data).length > 0) {
               updateState(msg.data as Parameters<typeof updateState>[0])
