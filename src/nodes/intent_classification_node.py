@@ -15,6 +15,7 @@ See: AGENTS.MD, docs/modules/nodes.md for policy details
 =======================================================================
 """
 
+import logging
 import os
 import re
 from typing import Any
@@ -24,6 +25,13 @@ from src.models.intent import IntentClassification
 from src.models.state import AgentState
 from src.prompts import get_template
 from src.utils.llm import get_chat_model, traced_node, traced_structured_llm_call
+
+logger = logging.getLogger(__name__)
+
+# Structured action prefix — sent by element_action WebSocket protocol.
+# Format: [ACTION:<action>:<element>] optional_feedback
+# Bypasses LLM classification (allowed exception per CLAUDE.md).
+_ACTION_PREFIX_RE = re.compile(r"^\[ACTION:(\w+):([^\]]+)\](?:\s+(.*))?$", re.DOTALL)
 
 
 def _require_api_key() -> None:
@@ -176,6 +184,45 @@ async def classify_intent_with_llm(
     return result
 
 
+_ACTION_INTENT_MAP = {
+    "approve": "confirm",
+    "reject": "reject",
+    "regenerate": "modify_answer",
+}
+
+
+def _classify_structured_action(match: re.Match) -> dict[str, Any]:
+    """Short-circuit classification for structured element actions.
+
+    Maps element_action protocol actions to intents without LLM call.
+    This is an allowed exception per CLAUDE.md policy.
+    """
+    action = match.group(1)
+    element = match.group(2)
+    feedback = (match.group(3) or "").strip()
+
+    intent = _ACTION_INTENT_MAP.get(action, "unrecognized")
+    logger.info("Structured action: %s on %s → intent=%s", action, element, intent)
+
+    result: dict[str, Any] = {
+        "last_intent": intent,
+        "_structured_action": {
+            "action": action,
+            "element": element,
+            "feedback": feedback,
+        },
+    }
+
+    # For regenerate with feedback, include modification details
+    if action == "regenerate" and feedback:
+        result["_modification"] = {
+            "field": element,
+            "new_value": feedback,
+        }
+
+    return result
+
+
 @traced_node
 async def intent_classification_node(state: AgentState) -> dict:
     """
@@ -197,7 +244,7 @@ async def intent_classification_node(state: AgentState) -> dict:
     """
     # Require API key - no fallback allowed
     _require_api_key()
-    
+
     # Get the last user message
     messages = state.get("messages", [])
     if not messages:
@@ -207,6 +254,12 @@ async def intent_classification_node(state: AgentState) -> dict:
 
     last_message = messages[-1]
     user_content = getattr(last_message, "content", str(last_message))
+
+    # Structured action short-circuit — element_action protocol bypasses LLM.
+    # This is an allowed exception per CLAUDE.md (simple binary conditions).
+    action_match = _ACTION_PREFIX_RE.match(user_content)
+    if action_match:
+        return _classify_structured_action(action_match)
 
     # Always use LLM for classification
     classification = await classify_intent_with_llm(user_content, state)

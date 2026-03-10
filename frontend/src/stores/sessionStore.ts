@@ -32,6 +32,8 @@ interface SessionStore {
   pendingFieldOverrides: Record<string, unknown>
   /** WebSocket send function, set by ChatPanel for use by other components. */
   wsSend: WsSendFn | null
+  /** Raw WebSocket reference for structured messages (element_action protocol). */
+  wsRef: WebSocket | null
   /** Auto-generated or user-edited chat title */
   chatTitle: string | null
   /** True after user downloads the final document */
@@ -44,6 +46,7 @@ interface SessionStore {
   setFieldOverride: (field: string, value: unknown) => void
   consumeFieldOverrides: () => Record<string, unknown> | null
   setWsSend: (fn: WsSendFn | null) => void
+  setWsRef: (ws: WebSocket | null) => void
   setChatTitle: (title: string) => void
   setDownloaded: (v: boolean) => void
   resumeSession: (id: string) => Promise<boolean>
@@ -61,6 +64,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   error: null,
   pendingFieldOverrides: {},
   wsSend: null,
+  wsRef: null,
   chatTitle: null,
   downloaded: false,
 
@@ -137,6 +141,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   },
 
   setWsSend: (fn) => set({ wsSend: fn }),
+  setWsRef: (ws) => set({ wsRef: ws }),
 
   setChatTitle: (title) => set({ chatTitle: title }),
   setDownloaded: (v) => set({ downloaded: v }),

@@ -147,6 +147,7 @@ export function useWebSocket(sessionId: string | null) {
   const activeSessionRef = useRef<string | null>(null)
 
   const setConnected = useSessionStore((s) => s.setConnected)
+  const setWsRef = useSessionStore((s) => s.setWsRef)
   const updateState = useSessionStore((s) => s.updateState)
   const addMessage = useChatStore((s) => s.addMessage)
   const setTyping = useChatStore((s) => s.setTyping)
@@ -189,6 +190,7 @@ export function useWebSocket(sessionId: string | null) {
           return
         }
         setConnected(true)
+        setWsRef(ws)
         retryRef.current = 0
         pingRef.current = setInterval(() => {
           if (ws.readyState === WebSocket.OPEN) {
@@ -298,6 +300,7 @@ export function useWebSocket(sessionId: string | null) {
         if (pingRef.current) clearInterval(pingRef.current)
         if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
         setTyping(false)
+        setWsRef(null)
 
         // Don't reconnect if session changed
         if (activeSessionRef.current !== sessionId) return

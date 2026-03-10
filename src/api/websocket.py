@@ -20,6 +20,7 @@ async def websocket_chat(websocket: WebSocket, session_id: str, manager: Session
 
     Protocol:
         Client sends: {"type": "user_message", "data": {"content": "..."}}
+        Client sends: {"type": "element_action", "data": {"element": "...", "action": "approve|reject|regenerate", "feedback": "..."}}
         Client sends: {"type": "stop"}
         Client sends: {"type": "ping"}
         Server sends: {"type": "agent_message", "data": {"content": "...", "phase": "...", "prompt": "..."}}
@@ -161,23 +162,43 @@ async def websocket_chat(websocket: WebSocket, session_id: str, manager: Session
                     })
                 continue
 
-            if msg_type != "user_message":
+            if msg_type == "element_action":
+                # Structured element action — bypass LLM intent classification.
+                # Translate to a structured content prefix that the graph can
+                # short-circuit on, avoiding a wasted LLM call.
+                ea_data = message.get("data", {})
+                ea_element = ea_data.get("element", "")
+                ea_action = ea_data.get("action", "")
+                ea_feedback = ea_data.get("feedback", "")
+                if not ea_element or ea_action not in ("approve", "reject", "regenerate"):
+                    await websocket.send_json({
+                        "type": "error",
+                        "data": {"message": f"Invalid element_action: element={ea_element!r}, action={ea_action!r}"},
+                    })
+                    continue
+                content = f"[ACTION:{ea_action}:{ea_element}]"
+                if ea_feedback:
+                    content += f" {ea_feedback}"
+                field_overrides = None
+                # Fall through to processing below (same as user_message)
+
+            elif msg_type == "user_message":
+                data = message.get("data", {})
+                content = data.get("content", "")
+                if not content:
+                    await websocket.send_json({
+                        "type": "error",
+                        "data": {"message": "Empty message content"},
+                    })
+                    continue
+                field_overrides = data.get("field_overrides") or None
+
+            else:
                 await websocket.send_json({
                     "type": "error",
                     "data": {"message": f"Unknown message type: {msg_type}"},
                 })
                 continue
-
-            data = message.get("data", {})
-            content = data.get("content", "")
-            if not content:
-                await websocket.send_json({
-                    "type": "error",
-                    "data": {"message": "Empty message content"},
-                })
-                continue
-
-            field_overrides = data.get("field_overrides") or None
 
             # Cancel any prior task still running (shouldn't happen, but be safe)
             if processing_task and not processing_task.done():

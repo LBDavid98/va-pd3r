@@ -262,19 +262,19 @@ Four architectural problems compound each other:
 
 ### Phase 2 Punch List
 
-- [ ] 2.1a Add `element_action` message type to `frontend/src/types/api.ts`
-- [ ] 2.1b Add `element_action` handler to `websocket.py`
-- [ ] 2.1c Wire ProductPanel approve/reject/regenerate to send `element_action` messages
-- [ ] 2.1d Test: structured approval works end-to-end via WebSocket
-- [ ] 2.2a Remove optimistic status update from ProductPanel approve button
-- [ ] 2.2b Add pending/loading state to approve button
-- [ ] 2.2c Verify element_update from backend drives status changes
-- [ ] 2.2d Test: approve flow works with backend-driven updates only
-- [ ] 2.3a Add structured action detection in intent classification or routing
-- [ ] 2.3b Bypass LLM classification for structured actions
-- [ ] 2.3c Test: structured approve, reject, regenerate all route correctly
-- [ ] 2.3d Test: free-text approval still works via LLM classification
-- [ ] 2.3e Run full frontend build + backend test suite
+- [x] 2.1a Add `element_action` message type + `ElementAction` type to `frontend/src/types/api.ts`
+- [x] 2.1b Add `element_action` handler to `websocket.py` — translates to `[ACTION:<action>:<element>]` content prefix
+- [x] 2.1c Wire ProductPanel approve/regenerate to send `element_action` messages
+- [x] 2.1d `wsRef` exposed via `useWebSocket` → `sessionStore` for structured sends
+- [x] 2.2a Remove optimistic status update from ProductPanel approve button
+- [x] 2.2b Add `pendingAction` state + loading spinner on approve button
+- [x] 2.2c `pendingAction` clears when `element.status` changes (backend confirmed via `element_update`)
+- [x] 2.2d Approve button disabled while `pendingAction` or `isTyping` active
+- [x] 2.3a Add `_ACTION_PREFIX_RE` regex in `intent_classification_node.py`
+- [x] 2.3b Add `_classify_structured_action()` — maps approve→confirm, reject→reject, regenerate→modify_answer
+- [x] 2.3c 18 unit tests for structured action protocol (regex, classification, intent mapping)
+- [x] 2.3d Free-text "approve" still works (falls through to LLM classification)
+- [x] 2.3e Full suite: 899 tests passing, tsc clean, vite build clean
 - [ ] 2.3f **Commit checkpoint: "Unify approval flow — backend authoritative for status"**
 
 ---

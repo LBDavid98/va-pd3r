@@ -13,7 +13,7 @@
  * Status dots use a spinner for `needs_revision` during active drafting (when
  * the agent is still processing) to avoid confusing transient QA failures.
  */
-import { useState, useCallback, useMemo } from "react"
+import { useState, useCallback, useMemo, useRef, useEffect } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import {
@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/tooltip"
 import { ExportBar } from "./ExportBar"
 import { cn } from "@/lib/utils"
-import type { DraftElementSummary, QACheckSummary } from "@/types/api"
+import type { DraftElementSummary, QACheckSummary, ElementAction } from "@/types/api"
 
 // Default target word counts — mirrors backend TARGET_WORD_COUNTS in drafting_sections.py
 const DEFAULT_TARGET_WORD_COUNTS: Record<string, number> = {
@@ -176,7 +176,8 @@ function DraftSection({
   const [editingTarget, setEditingTarget] = useState(false)
   const [targetDraft, setTargetDraft] = useState("")
   const [currentTarget, setCurrentTarget] = useState(targetWordCount)
-  const wsSend = useSessionStore((s) => s.wsSend)
+  const [pendingAction, setPendingAction] = useState<ElementAction | null>(null)
+  const wsRef = useSessionStore((s) => s.wsRef)
   const phase = useSessionStore((s) => s.phase)
   const isTyping = useChatStore((s) => s.isTyping)
   const addMessage = useChatStore((s) => s.addMessage)
@@ -190,15 +191,38 @@ function DraftSection({
   const qaReview = element?.qa_review ?? null
   const actualWords = hasContent ? countWords(element!.content!) : 0
 
+  // Clear pending action when element status changes (backend confirmed)
+  const prevStatusRef = useRef(element?.status)
+  useEffect(() => {
+    if (element?.status !== prevStatusRef.current) {
+      prevStatusRef.current = element?.status
+      setPendingAction(null)
+    }
+  }, [element?.status])
+
+  /** Send a structured element action over WebSocket (bypasses LLM classification). */
+  const sendElementAction = useCallback(
+    (action: ElementAction, feedback?: string) => {
+      if (!wsRef) return
+      setPendingAction(action)
+      const data: Record<string, unknown> = { element: sectionName, action }
+      if (feedback) data.feedback = feedback
+      wsRef.send(JSON.stringify({ type: "element_action", data }))
+      setTyping(true)
+    },
+    [wsRef, sectionName, setTyping],
+  )
+
+  /** Send a free-text message to the agent (for chat-based interactions). */
   const sendAgentMessage = useCallback(
     (content: string) => {
       addMessage("user", content)
-      if (wsSend) {
-        wsSend(content)
+      if (wsRef) {
+        wsRef.send(JSON.stringify({ type: "user_message", data: { content } }))
         setTyping(true)
       }
     },
-    [wsSend, addMessage, setTyping],
+    [wsRef, addMessage, setTyping],
   )
 
   // --- Lock ---
@@ -228,14 +252,12 @@ function DraftSection({
     setEditDraft("")
   }, [])
 
-  // --- Regenerate (sends stored feedback as context) ---
+  // --- Regenerate (sends structured action with feedback) ---
   const handleRegenerate = useCallback(() => {
     if (isLocked) return
     updateElement(sectionName, { edited: false })
-    const parts: string[] = [`Please regenerate the "${displayName}" section.`]
-    if (notes.trim()) parts.push(`\n\nFeedback: ${notes.trim()}`)
-    sendAgentMessage(parts.join(""))
-  }, [isLocked, displayName, notes, sectionName, sendAgentMessage, updateElement])
+    sendElementAction("regenerate", notes.trim() || undefined)
+  }, [isLocked, notes, sectionName, sendElementAction, updateElement])
 
   const saveTarget = useCallback(() => {
     const num = parseInt(targetDraft, 10)
@@ -315,7 +337,7 @@ function DraftSection({
         )}
 
         {/* Approve button — visible when content exists and not yet approved/locked */}
-        {hasContent && !editing && !isLocked && !isTyping && element?.status !== "approved" && (
+        {hasContent && !editing && !isLocked && element?.status !== "approved" && (
           <TooltipProvider delayDuration={300}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -323,12 +345,12 @@ function DraftSection({
                   variant="ghost"
                   size="icon"
                   className="h-7 w-7 shrink-0 text-green-600 hover:text-green-700 hover:bg-green-50"
-                  onClick={() => {
-                    updateElement(sectionName, { locked: true, status: "approved" as DraftElementSummary["status"] })
-                    sendAgentMessage("approve")
-                  }}
+                  disabled={pendingAction === "approve" || isTyping}
+                  onClick={() => sendElementAction("approve")}
                 >
-                  <CircleCheck className="h-4 w-4" />
+                  {pendingAction === "approve"
+                    ? <Loader2 className="h-4 w-4 animate-spin" />
+                    : <CircleCheck className="h-4 w-4" />}
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom">Approve &amp; lock section</TooltipContent>
