@@ -77,12 +77,6 @@ __all__ = [
     "build_export_context",
 ]
 
-# Procedural generator exports
-from src.utils.procedural_generators import (
-    generate_procedural_content,
-    is_procedural_section,
-)
-
 # State compaction exports
 from src.utils.state_compactor import (
     compact_after_interview,

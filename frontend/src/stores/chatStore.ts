@@ -2,7 +2,7 @@ import { create } from "zustand"
 import { nanoid } from "nanoid"
 import type { ChatMessage, ChatMessageType } from "@/types/api"
 
-const HUNG_THRESHOLD_MS = 60_000
+const HUNG_THRESHOLD_MS = 120_000
 
 interface ChatStore {
   messages: ChatMessage[]
@@ -25,8 +25,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   addMessage: (role, content, type = "normal") =>
     set((s) => {
       // Deduplicate: skip if the last message has identical role + content
+      // within a 2-second window. This prevents WS echo duplicates while
+      // still allowing legitimate repeated messages (e.g. approving
+      // different sections that produce the same confirmation text).
       const last = s.messages[s.messages.length - 1]
-      if (last && last.role === role && last.content === content) {
+      if (last && last.role === role && last.content === content && Date.now() - last.timestamp < 2000) {
         return s
       }
       return {

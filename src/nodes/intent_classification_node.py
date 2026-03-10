@@ -177,27 +177,7 @@ async def classify_intent_with_llm(
 
 
 @traced_node
-def intent_classification_node(state: AgentState) -> dict:
-    """
-    Classify user intent from their last message (sync wrapper).
-
-    This is a sync wrapper that calls the async implementation.
-    All intent classification REQUIRES a real LLM call - no mock fallbacks.
-
-    Args:
-        state: Current agent state with messages
-
-    Returns:
-        State update with classified intent
-        
-    Raises:
-        ConfigurationError: If OPENAI_API_KEY is not configured
-    """
-    from src.utils.async_compat import run_async
-    return run_async(intent_classification_node_async(state))
-
-
-async def intent_classification_node_async(state: AgentState) -> dict:
+async def intent_classification_node(state: AgentState) -> dict:
     """
     Classify user intent from their last message (async LLM version).
 

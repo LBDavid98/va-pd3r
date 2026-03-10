@@ -139,26 +139,7 @@ async def answer_question_with_llm(
 
 
 @traced_node
-def answer_question_node(state: AgentState) -> dict:
-    """
-    Answer user question using LLM (sync wrapper).
-    
-    ⚠️ NO MOCK IMPLEMENTATIONS - This node requires real LLM calls.
-    
-    Args:
-        state: Current agent state with pending_question
-
-    Returns:
-        State update with answer message
-        
-    Raises:
-        RuntimeError: If ANTHROPIC_API_KEY is not set
-    """
-    from src.utils.async_compat import run_async
-    return run_async(answer_question_node_async(state))
-
-
-async def answer_question_node_async(state: AgentState) -> dict:
+async def answer_question_node(state: AgentState) -> dict:
     """
     Answer user question using LLM (async version).
 
@@ -230,3 +211,7 @@ async def answer_question_node_async(state: AgentState) -> dict:
             "pending_question": None,
             "next_prompt": error_msg,
         }
+
+
+# Backwards-compatible alias for existing imports
+answer_question_node_async = answer_question_node

@@ -22,6 +22,9 @@ from langgraph.types import Command
 from src.graphs.main_graph import build_graph
 from src.models.draft import DraftElement, create_all_draft_elements
 from src.config.intake_fields import INTAKE_FIELDS
+from src.api.element_tracker import ElementChangeTracker
+from src.api.transforms import qa_review_to_summary
+from src.utils.llm import is_tracing_enabled, start_run_trace, save_trace_log
 
 logger = logging.getLogger(__name__)
 
@@ -279,17 +282,17 @@ class SessionManager:
     ) -> dict:
         """Send a user message and get the agent's response.
 
+        Orchestration only — delegates streaming, element tracking, and message
+        collection to dedicated helpers.
+
         Args:
             session_id: The session ID
             content: User message text
             field_overrides: Optional dict of field_name → new_value to patch
                 into interview_data before the graph resumes.
-            on_message: Optional async callback(str) called for each AI message
-                as nodes complete, enabling real-time streaming to the client.
-            on_state: Optional async callback(dict) called with state updates
-                as nodes complete, enabling real-time phase/field updates.
-            on_element_update: Optional async callback(dict) called when a draft
-                element changes (content or status), with keys: name, status, content.
+            on_message: Optional async callback(str) for real-time AI messages.
+            on_state: Optional async callback(dict) for real-time state updates.
+            on_element_update: Optional async callback(dict) for element changes.
 
         Returns:
             Response dict with agent messages, state, and interrupt data
@@ -300,7 +303,10 @@ class SessionManager:
         if session_id not in self._sessions:
             raise ValueError(f"Session {session_id} not found")
 
-        # Register the current task for cancellation support
+        if is_tracing_enabled():
+            run_id = start_run_trace()
+            logger.info(f"Trace started for session {session_id[:8]}, run_id={run_id}")
+
         task = asyncio.current_task()
         if task:
             self._active_tasks[session_id] = task
@@ -308,103 +314,91 @@ class SessionManager:
         try:
             config = self._config_for(session_id)
 
-            # Apply field overrides before resuming the graph
             if field_overrides:
                 await self._apply_field_overrides(config, field_overrides)
 
-            # Snapshot message count before this turn so we only return NEW messages
             pre_state = await self._graph.aget_state(config)
-            pre_msg_count = len(pre_state.values.get("messages", [])) if pre_state and pre_state.values else 0
+            pre_msgs = pre_state.values.get("messages", []) if pre_state and pre_state.values else []
+            pre_elements = pre_state.values.get("draft_elements", []) if pre_state and pre_state.values else []
 
-            # Track how many messages we've already streamed to avoid duplicates
-            last_streamed_count = pre_msg_count
+            result, last_streamed_count = await self._stream_graph(
+                session_id, config, content, len(pre_msgs), pre_elements,
+                on_message, on_state, on_element_update,
+            )
 
-            # Resume graph with user input, streaming intermediate results
-            result = None
-            # Track draft element snapshots for change detection
-            prev_elements: dict[str, tuple[str, str]] = {}  # name → (status, content_hash)
-            async for event in self._graph.astream(
-                Command(resume=content), config, stream_mode="values"
-            ):
-                result = event
-
-                # Stream new AI messages incrementally as each node completes
-                if "messages" in event:
-                    current_msgs = event["messages"]
-                    for msg in current_msgs[last_streamed_count:]:
-                        if hasattr(msg, "type") and msg.type == "ai":
-                            if on_message:
-                                await on_message(msg.content)
-                            if on_state:
-                                await on_state(self._extract_state(session_id, event))
-                    last_streamed_count = len(current_msgs)
-
-                # Detect draft element changes and stream updates
-                if on_element_update and "draft_elements" in event:
-                    for elem in event["draft_elements"]:
-                        if not isinstance(elem, dict):
-                            continue
-                        name = elem.get("name", "")
-                        status = elem.get("status", "")
-                        content = elem.get("content", "")
-                        content_hash = str(len(content)) + content[:50]
-                        prev = prev_elements.get(name)
-                        if prev is None or prev != (status, content_hash):
-                            prev_elements[name] = (status, content_hash)
-                            # Transform qa_review to frontend shape (checks, not check_results)
-                            qa_summary = None
-                            raw_qa = elem.get("qa_review")
-                            if isinstance(raw_qa, dict):
-                                checks = raw_qa.get("check_results") or raw_qa.get("checks") or []
-                                qa_summary = {
-                                    "passes": raw_qa.get("passes", False),
-                                    "overall_feedback": raw_qa.get("overall_feedback", ""),
-                                    "checks": [
-                                        {
-                                            "requirement_id": c.get("requirement_id", ""),
-                                            "passed": c.get("passed", False),
-                                            "explanation": c.get("explanation", ""),
-                                            "severity": c.get("severity", "critical"),
-                                            "suggestion": c.get("suggestion"),
-                                        }
-                                        for c in checks if isinstance(c, dict)
-                                    ],
-                                    "passed_count": raw_qa.get("passed_count", 0),
-                                    "failed_count": raw_qa.get("failed_count", 0),
-                                }
-                            await on_element_update({
-                                "name": name,
-                                "status": status,
-                                "content": content,
-                                "display_name": elem.get("display_name", name),
-                                "qa_review": qa_summary,
-                            })
-
-            # Collect only messages NOT already streamed
-            messages = []
-            if result and "messages" in result:
-                for msg in result["messages"][last_streamed_count:]:
-                    if hasattr(msg, "type") and msg.type == "ai":
-                        messages.append(msg.content)
-
-            # Track position title and persist metadata
-            if result and "interview_data" in result:
-                interview_data = result.get("interview_data", {})
-                title = interview_data.get("position_title", {}).get("value")
-                if title and title != self._sessions[session_id].get("position_title"):
-                    self._sessions[session_id]["position_title"] = title
-                    await self._save_session_meta(session_id)
-
-            # Get interrupt value
+            unstreamed = self._collect_unstreamed_messages(result, last_streamed_count)
+            await self._update_position_title(session_id, result)
             interrupt_data = await self._get_interrupt(config)
 
             return {
-                "messages": messages,
+                "messages": unstreamed,
                 "state": self._extract_state(session_id, result),
                 "interrupt": interrupt_data,
             }
         finally:
             self._active_tasks.pop(session_id, None)
+            if is_tracing_enabled():
+                trace_result = save_trace_log()
+                if trace_result:
+                    logger.info(f"Trace saved: {trace_result[1]}")
+
+    async def _stream_graph(
+        self, session_id: str, config: dict, content: str,
+        pre_msg_count: int, pre_elements: list[dict],
+        on_message: Any | None, on_state: Any | None, on_element_update: Any | None,
+    ) -> tuple[dict | None, int]:
+        """Stream graph execution, relaying messages and element changes.
+
+        Returns:
+            (final_event, last_streamed_message_count)
+        """
+        tracker = ElementChangeTracker(pre_elements) if on_element_update else None
+        last_streamed_count = pre_msg_count
+        result = None
+
+        async for event in self._graph.astream(
+            Command(resume=content), config, stream_mode="values"
+        ):
+            result = event
+
+            # Stream new AI messages as each node completes
+            if "messages" in event:
+                current_msgs = event["messages"]
+                for msg in current_msgs[last_streamed_count:]:
+                    if hasattr(msg, "type") and msg.type == "ai":
+                        if on_message:
+                            await on_message(msg.content)
+                        if on_state:
+                            await on_state(self._extract_state(session_id, event))
+                last_streamed_count = len(current_msgs)
+
+            # Detect and stream element changes
+            if tracker and "draft_elements" in event:
+                for change in tracker.detect_changes(event["draft_elements"]):
+                    await on_element_update(tracker.to_dict(change))
+
+        return result, last_streamed_count
+
+    @staticmethod
+    def _collect_unstreamed_messages(result: dict | None, last_streamed_count: int) -> list[str]:
+        """Collect AI messages that were not already streamed."""
+        if not result or "messages" not in result:
+            return []
+        return [
+            msg.content
+            for msg in result["messages"][last_streamed_count:]
+            if hasattr(msg, "type") and msg.type == "ai"
+        ]
+
+    async def _update_position_title(self, session_id: str, result: dict | None) -> None:
+        """Track position title changes and persist metadata."""
+        if not result or "interview_data" not in result:
+            return
+        interview_data = result.get("interview_data", {})
+        title = interview_data.get("position_title", {}).get("value")
+        if title and title != self._sessions[session_id].get("position_title"):
+            self._sessions[session_id]["position_title"] = title
+            await self._save_session_meta(session_id)
 
     async def stop_session(self, session_id: str) -> bool:
         """Cancel the active task for a session if one is running.
@@ -489,25 +483,7 @@ class SessionManager:
                 if not is_sup and elem.name in SUPERVISORY_DRAFT_ELEMENT_NAMES:
                     continue
                 locked = elem_dict.get("_locked", False)
-                # Build QA summary if available
-                qa_summary = None
-                if elem.qa_review is not None:
-                    qa_summary = {
-                        "passes": elem.qa_review.passes,
-                        "overall_feedback": elem.qa_review.overall_feedback,
-                        "checks": [
-                            {
-                                "requirement_id": c.requirement_id,
-                                "passed": c.passed,
-                                "explanation": c.explanation,
-                                "severity": c.severity,
-                                "suggestion": c.suggestion,
-                            }
-                            for c in elem.qa_review.check_results
-                        ],
-                        "passed_count": elem.qa_review.passed_count,
-                        "failed_count": elem.qa_review.failed_count,
-                    }
+                qa_summary = qa_review_to_summary(elem.qa_review)
                 elements.append({
                     "name": elem.name,
                     "display_name": elem.display_name,
@@ -605,7 +581,12 @@ class SessionManager:
             return
 
         interview_data = dict(state.values.get("interview_data", {}))
+        applied = []
         for field_name, new_value in overrides.items():
+            # Only accept overrides for known intake fields
+            if field_name not in INTAKE_FIELDS:
+                logger.warning("Ignoring unknown field override: %s", field_name)
+                continue
             existing = interview_data.get(field_name, {})
             if isinstance(existing, dict):
                 existing = dict(existing)
@@ -615,9 +596,11 @@ class SessionManager:
             existing["needs_confirmation"] = False
             existing["confirmed"] = True
             interview_data[field_name] = existing
+            applied.append(field_name)
 
-        await self._graph.aupdate_state(config, {"interview_data": interview_data})
-        logger.info("Applied field overrides: %s", list(overrides.keys()))
+        if applied:
+            await self._graph.aupdate_state(config, {"interview_data": interview_data})
+            logger.info("Applied field overrides: %s", applied)
 
     def _extract_state(self, session_id: str, result: dict | None) -> dict:
         """Extract a clean state summary from graph state."""

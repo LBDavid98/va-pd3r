@@ -24,6 +24,7 @@ async def websocket_chat(websocket: WebSocket, session_id: str, manager: Session
         Client sends: {"type": "ping"}
         Server sends: {"type": "agent_message", "data": {"content": "...", "phase": "...", "prompt": "..."}}
         Server sends: {"type": "state_update", "data": {...session state...}}
+        Server sends: {"type": "done"}  — signals processing complete; client should stop typing indicator
         Server sends: {"type": "stopped", "data": {...session state...}}
         Server sends: {"type": "error", "data": {"message": "..."}}
         Server sends: {"type": "pong"}
@@ -76,10 +77,14 @@ async def websocket_chat(websocket: WebSocket, session_id: str, manager: Session
                     "data": {"content": msg_content},
                 })
 
-            # Send interrupt/prompt if present
+            # Send interrupt/prompt if present (skip empty prompts)
             interrupt = result.get("interrupt")
             if interrupt:
-                prompt_content = interrupt if isinstance(interrupt, str) else interrupt.get("message", "")
+                prompt_content = interrupt if isinstance(interrupt, str) else interrupt.get("prompt", interrupt.get("message", ""))
+                if not prompt_content:
+                    logger.warning("Empty interrupt prompt for session %s, skipping", session_id)
+                    interrupt = None
+            if interrupt:
                 prompt_data = {"content": prompt_content, "prompt": prompt_content}
                 if isinstance(interrupt, dict):
                     prompt_data["phase"] = interrupt.get("phase")
@@ -96,6 +101,10 @@ async def websocket_chat(websocket: WebSocket, session_id: str, manager: Session
                 "type": "state_update",
                 "data": state,
             })
+
+            # Signal processing complete — frontend uses this as the
+            # single source of truth to turn off the typing indicator.
+            await websocket.send_json({"type": "done"})
 
         except asyncio.CancelledError:
             # Task was stopped by the user — send current state back

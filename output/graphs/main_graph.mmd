@@ -36,6 +36,7 @@ graph TD
     handle_write_another[Handle Write Another]
     export_document[Export Document]
     error_handler[Error Handler]
+    reprompt[Reprompt]
     __end__((End))
 
     %% Edges
@@ -44,6 +45,7 @@ graph TD
     advance_element -.-> error_handler
     advance_element -.-> finalize
     advance_element -.-> generate_element
+    advance_element -.-> qa_review
     advance_element -.-> user_input
     answer_question --> user_input
     check_interview_complete --> prepare_next
@@ -60,6 +62,7 @@ graph TD
     classify_intent -.-> init
     classify_intent -.-> map_answers
     classify_intent -. &nbsp;handle_unrecognized&nbsp; .-> prepare_next
+    classify_intent -.-> reprompt
     classify_intent -.-> user_input
     end_conversation -.-> __end__
     end_conversation -.-> error_handler
@@ -87,6 +90,7 @@ graph TD
     qa_review -.-> error_handler
     qa_review -.-> generate_element
     qa_review -.-> user_input
+    reprompt --> user_input
     user_input --> classify_intent
 
     %% Styles
@@ -98,19 +102,19 @@ graph TD
     classDef qa fill:#fff8e1,stroke:#FFC107,stroke-width:2px,color:#F57F17
     classDef routing fill:#fce4ec,stroke:#E91E63,stroke-width:1px,color:#880E4F,stroke-dasharray:3
 
-    class end_conversation startEnd
     class user_input interview
-    class qa_review qa
-    class check_interview_complete interview
-    class __start__ startEnd
-    class map_answers interview
     class prepare_next interview
-    class __end__ startEnd
-    class advance_element routing
-    class evaluate_fes drafting
-    class handle_draft_response drafting
     class init init
-    class gather_requirements drafting
+    class map_answers interview
+    class qa_review qa
+    class advance_element routing
     class answer_question interview
-    class generate_element drafting
+    class evaluate_fes drafting
     class classify_intent routing
+    class gather_requirements drafting
+    class __start__ startEnd
+    class end_conversation startEnd
+    class __end__ startEnd
+    class check_interview_complete interview
+    class handle_draft_response drafting
+    class generate_element drafting

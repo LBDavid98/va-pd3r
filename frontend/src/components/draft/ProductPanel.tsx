@@ -262,8 +262,11 @@ function DraftSection({
   const isAgentProcessing = phase === "drafting" && isTyping
   const statusDot = (() => {
     if (!element) return null
-    if (element.status === "needs_revision" && isAgentProcessing) {
-      return <Loader2 className="h-3 w-3 animate-spin text-amber-400 shrink-0" />
+    // During active drafting, "drafted" means QA is running and "needs_revision"
+    // means an auto-rewrite is pending — show spinners for both.
+    if ((element.status === "drafted" || element.status === "needs_revision") && isAgentProcessing) {
+      const color = element.status === "drafted" ? "text-blue-400" : "text-amber-400"
+      return <Loader2 className={`h-3 w-3 animate-spin ${color} shrink-0`} />
     }
     switch (element.status) {
       case "approved": return <span className="h-2 w-2 rounded-full bg-green-500 shrink-0" />
@@ -312,7 +315,7 @@ function DraftSection({
         )}
 
         {/* Approve button — visible when content exists and not yet approved/locked */}
-        {hasContent && !editing && !isLocked && element?.status !== "approved" && (
+        {hasContent && !editing && !isLocked && !isTyping && element?.status !== "approved" && (
           <TooltipProvider delayDuration={300}>
             <Tooltip>
               <TooltipTrigger asChild>

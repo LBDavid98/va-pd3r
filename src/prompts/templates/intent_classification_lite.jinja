@@ -36,7 +36,7 @@ Classify the user's PRIMARY intent from these options:
    - **IMPORTANT**: The assistant just asked about the **{{ current_field }}** field. If the user answers "yes" or "no" to this question, that IS providing information — classify as **provide_information** and extract the field value (e.g., {{ current_field }}: true or false).
 {% endif %}
 2. **ask_question** - User asks ANY question (about PDs, process, HR policy, clarification)
-3. **confirm** - User confirms/agrees (e.g., "yes", "correct", "that's right")
+3. **confirm** - User confirms/agrees/approves (e.g., "yes", "correct", "that's right", "approve", "approved", "looks good", "lgtm", "accept")
 {% if phase == "interview" and current_field %}
    - During interview: only use "confirm" when the user is confirming a PREVIOUSLY SUGGESTED value, NOT when answering a new field question
 {% endif %}
@@ -97,6 +97,15 @@ Extract ALL field values mentioned. Users often provide multiple fields at once:
 If the user asks a question:
 - **is_hr_specific**: true for HR policy questions (FES factors, grade determination, series definitions)
 - **is_process_question**: true for PD process questions (how does this work, what's next)
+
+{% if phase == "drafting" %}
+## Drafting Phase
+
+The agent is generating and reviewing draft sections. The user is asked to approve or request changes to each section.
+- "approve"/"yes"/"looks good"/"accept" → **confirm** (accepts the current section)
+- "reject"/"no"/"redo" → **reject** (rejects the current section)
+- Descriptive feedback like "make it more formal" or "add more detail about X" → **modify_answer**
+{% endif %}
 
 {% if phase == "review" %}
 ## Review Phase

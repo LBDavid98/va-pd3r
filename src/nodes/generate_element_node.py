@@ -5,8 +5,7 @@ Uses SECTION_REGISTRY from business rules to determine section-specific prompts.
 
 Implements tiered generation:
 - literal: Fixed text, no LLM call (Factor 8/9)
-- procedural: Template-based generation (intro/background)
-- llm: Full LLM generation (duties, factors 1-7)
+- llm: Full LLM generation (all narrative sections)
 
 Includes error handling that routes to error_handler on LLM/generation failures.
 """
@@ -29,7 +28,6 @@ from src.models.interview import InterviewData
 from src.models.requirements import DraftRequirements
 from src.models.state import AgentState
 from src.utils.llm import traced_llm_call, traced_node
-from src.utils.procedural_generators import generate_procedural_content
 
 logger = logging.getLogger(__name__)
 
@@ -149,6 +147,7 @@ def _format_org(org_value) -> str:
     return str(org_value)
 
 
+@traced_node
 async def generate_element_node(state: AgentState) -> dict:
     """
     Generate a single draft element using LLM.
@@ -206,18 +205,30 @@ async def generate_element_node(state: AgentState) -> dict:
         element_index = ready_indices[0]
         state_updates["current_element_index"] = element_index
     
-    # Batch-generate all ready elements in parallel
-    ready_to_generate = ready_indices
+    # Only generate elements that actually need generation (pending or needs_revision).
+    # Skip "drafted" elements — they were already generated (e.g. by batch) and
+    # should go through QA, not be regenerated.
+    ready_to_generate = [
+        idx for idx in ready_indices
+        if draft_elements[idx].get("status") in {"pending", "needs_revision"}
+    ]
+    if not ready_to_generate:
+        # All ready elements are already drafted — move on to QA/user
+        primary = DraftElement.model_validate(draft_elements[element_index])
+        return _merge({
+            "messages": [AIMessage(content=f"**{primary.display_name}** is ready for review.")],
+            "draft_elements": draft_elements,
+            "next_prompt": "Running QA review...",
+        })
 
     async def _generate_single(idx: int) -> tuple:
         """
         Generate a single element based on its generation tier.
-        
+
         Tiers:
         - literal: Fixed text (Factor 8/9), no LLM call
-        - procedural: Template + interview data (intro/background), no LLM call
-        - llm: Full LLM generation (duties, factors 1-7)
-        
+        - llm: Full LLM generation (all narrative sections)
+
         Returns: (elem, content, is_rewrite, is_non_llm, error)
         """
         elem_dict = draft_elements[idx]
@@ -266,19 +277,7 @@ async def generate_element_node(state: AgentState) -> dict:
             logger.debug(f"Tier 'literal': Generated {elem.name} without LLM")
             return elem, content_local, is_rewrite_local, True, None
         
-        # TIER 2: Procedural generation (intro/background)
-        # Template-based generation using interview data - no LLM call
-        if generation_tier == "procedural" and not is_rewrite_local:
-            procedural_content = generate_procedural_content(elem.name, interview_data_local)
-            if procedural_content:
-                elem.update_content(procedural_content, is_rewrite=False)
-                draft_elements[idx] = elem.model_dump()
-                logger.debug(f"Tier 'procedural': Generated {elem.name} without LLM")
-                return elem, procedural_content, False, True, None
-            # Fall through to LLM if procedural generation fails
-            logger.warning(f"Procedural generation failed for {elem.name}, falling back to LLM")
-        
-        # TIER 3: LLM generation (duties, factors 1-7, rewrites)
+        # TIER 2: LLM generation (duties, factors 1-7, intro, background, rewrites)
         # Full LLM generation with prompt template
         context_local = _build_prompt_context(
             element=elem,
@@ -295,7 +294,13 @@ async def generate_element_node(state: AgentState) -> dict:
             rewrite_context_local = elem.get_rewrite_context()
             context_local.update(rewrite_context_local)
         else:
-            template_local = jinja_env.get_template("draft.jinja")
+            # Use section-specific template if available, fall back to generic
+            section_template = f"draft_{elem.name}.jinja"
+            try:
+                template_local = jinja_env.get_template(section_template)
+                logger.debug(f"Using section-specific template: {section_template}")
+            except Exception:
+                template_local = jinja_env.get_template("draft.jinja")
 
         prompt_local = template_local.render(**context_local)
         from src.utils import get_model_for_attempt
@@ -387,9 +392,5 @@ async def generate_element_node(state: AgentState) -> dict:
     })
 
 
-# Synchronous wrapper for graph compatibility
-@traced_node
-def generate_element_node_sync(state: AgentState) -> dict:
-    """Synchronous wrapper for generate_element_node."""
-    from src.utils.async_compat import run_async
-    return run_async(generate_element_node(state))
+# Keep alias for backwards compatibility with imports
+generate_element_node_sync = generate_element_node

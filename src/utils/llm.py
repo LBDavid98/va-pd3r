@@ -161,36 +161,56 @@ def start_run_trace() -> str:
 
 def traced_node(func: Callable) -> Callable:
     """Decorator to wrap a LangGraph node function with tracing.
-    
-    The decorated function should take AgentState as first argument
-    and return a state update dict.
-    
+
+    Supports both sync and async node functions. LangGraph handles
+    async nodes natively via ``await``, so async nodes should be
+    registered directly (no sync wrapper or ``run_async`` bridge).
+
     Usage:
         @traced_node
-        def my_node(state: AgentState) -> dict:
+        def my_sync_node(state: AgentState) -> dict:
             ...
-            return {"key": "value"}
-    
+
+        @traced_node
+        async def my_async_node(state: AgentState) -> dict:
+            ...
+
     Args:
-        func: Node function to wrap
-        
+        func: Node function to wrap (sync or async)
+
     Returns:
-        Wrapped function with tracing
+        Wrapped function with tracing (preserves sync/async nature)
     """
-    @wraps(func)
-    def wrapper(state: dict[str, Any]) -> dict[str, Any]:
-        node_name = func.__name__
-        
-        with trace_node(node_name, state) as trace:
-            result = func(state)
-            
-            # Record state on exit
-            if trace and result:
-                finalize_node_trace(result)
-            
-            return result
-    
-    return wrapper
+    if asyncio.iscoroutinefunction(func):
+        @wraps(func)
+        async def async_wrapper(state: dict[str, Any]) -> dict[str, Any]:
+            node_name = func.__name__
+
+            with trace_node(node_name, state) as trace:
+                result = await func(state)
+
+                # Record state on exit
+                if trace and result:
+                    finalize_node_trace(result)
+
+                return result
+
+        return async_wrapper
+    else:
+        @wraps(func)
+        def wrapper(state: dict[str, Any]) -> dict[str, Any]:
+            node_name = func.__name__
+
+            with trace_node(node_name, state) as trace:
+                result = func(state)
+
+                # Record state on exit
+                if trace and result:
+                    finalize_node_trace(result)
+
+                return result
+
+        return wrapper
 
 
 @contextmanager

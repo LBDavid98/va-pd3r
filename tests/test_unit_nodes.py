@@ -39,23 +39,23 @@ def test_end_conversation_node_sets_should_end_when_rejected(sample_state):
     assert len(result["messages"]) == 1
 
 
-def test_intent_classification_node_with_quit(sample_state):
+async def test_intent_classification_node_with_quit(sample_state):
     """Test intent classification recognizes quit."""
     from langchain_core.messages import HumanMessage
 
     sample_state["messages"] = [HumanMessage(content="quit")]
 
-    result = intent_classification_node(sample_state)
+    result = await intent_classification_node(sample_state)
 
     assert result["last_intent"] == "quit"
 
 
-def test_intent_classification_node_with_confirm(sample_state):
+async def test_intent_classification_node_with_confirm(sample_state):
     """Test intent classification recognizes confirm."""
     from langchain_core.messages import HumanMessage
 
     sample_state["messages"] = [HumanMessage(content="yes")]
 
-    result = intent_classification_node(sample_state)
+    result = await intent_classification_node(sample_state)
 
     assert result["last_intent"] == "confirm"

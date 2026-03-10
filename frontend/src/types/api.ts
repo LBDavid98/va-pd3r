@@ -119,7 +119,7 @@ export interface DraftState {
 // --- WebSocket ---
 
 export interface WSIncoming {
-  type: "agent_message" | "state_update" | "element_update" | "stopped" | "error" | "pong"
+  type: "agent_message" | "state_update" | "element_update" | "done" | "stopped" | "error" | "pong"
   data: Record<string, unknown>
 }
 

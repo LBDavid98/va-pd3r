@@ -127,10 +127,12 @@ def error_handler_node(state: AgentState) -> dict[str, Any]:
     # Get user-friendly message
     user_message = _get_user_message(error)
     
-    # Return state update that clears error and provides recovery message
+    # Return state update that clears error and provides recovery message.
+    # next_prompt is required so user_input_node has something to interrupt with.
     return {
         "last_error": None,  # Clear the error
         "messages": [AIMessage(content=user_message)],
+        "next_prompt": user_message,
     }
 
 

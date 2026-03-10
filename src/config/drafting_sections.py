@@ -6,14 +6,13 @@ drafting_tools to determine how to produce each PD section.
 
 Generation tiers:
 - "literal": Fixed text, no LLM call needed (Factor 8, Factor 9)
-- "procedural": Template-based generation using interview data (intro, background)
-- "llm": Full LLM generation required (duties, factors 1-7)
+- "llm": Full LLM generation required (all narrative sections)
 """
 
 from typing import Literal
 
 
-GenerationTier = Literal["literal", "procedural", "llm"]
+GenerationTier = Literal["literal", "llm"]
 
 # Target word counts per section. Based on baseline from real GS-1560-13 output.
 # Adjust these defaults as needed — they are guidance, not hard limits.
@@ -316,7 +315,6 @@ def get_generation_tier(section_id: str) -> GenerationTier:
 
     Returns:
         "literal" - Fixed text, no LLM call needed
-        "procedural" - Template-based generation using interview data
         "llm" - Full LLM generation required (default)
     """
     section_config = SECTION_REGISTRY.get(section_id, {})

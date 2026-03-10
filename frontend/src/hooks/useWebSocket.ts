@@ -8,11 +8,19 @@ import type { WSIncoming, WSAgentMessage, WSElementUpdate, Phase, ChatMessageTyp
 const PING_INTERVAL = 30_000
 const RECONNECT_BASE = 1_000
 const RECONNECT_MAX = 16_000
+const TYPING_TIMEOUT = 90_000 // Safety: clear typing indicator after 90s of no response
 
 /**
- * Classify agent messages to reduce chat noise.
- * Covers requirements, drafting, and review phases.
- * Returns: "show" (normal bubble), "system" (condensed notification), or "suppress" (hide).
+ * Classify agent messages to reduce chat noise during drafting.
+ *
+ * Returns:
+ *   "show"     → normal chat bubble (user-facing content)
+ *   "system"   → condensed notification (progress, approvals)
+ *   "suppress" → hidden entirely (internal plumbing)
+ *
+ * Key principle: anything the user initiated (approve, regenerate) should
+ * produce at least a system message so they know it worked.  Internal
+ * pipeline messages (QA details, element transitions) can be suppressed.
  */
 function classifyAgentMessage(content: string): { action: "show" | "system" | "suppress"; replacement?: string } {
   const lower = content.toLowerCase()
@@ -26,7 +34,7 @@ function classifyAgentMessage(content: string): { action: "show" | "system" | "s
     return { action: "suppress" }
   }
 
-  // --- Drafting preamble ---
+  // --- Drafting preamble (internal setup) ---
   if (lower.includes("ready to start writing") || lower.includes("position description consists of")) {
     return { action: "suppress" }
   }
@@ -37,45 +45,61 @@ function classifyAgentMessage(content: string): { action: "show" | "system" | "s
     return { action: "suppress" }
   }
 
-  // --- "Generated draft for X (queued for QA)." ---
+  // --- Batch generation noise ---
   if (lower.includes("generated draft for") || lower.includes("queued for qa")) {
     return { action: "suppress" }
   }
-
-  // --- QA review results ---
-  if (lower.includes("qa review") && lower.includes("requirements passed")) {
+  if (lower.includes("is ready for review")) {
     return { action: "suppress" }
   }
-  if (lower.includes("passed qa") || (lower.includes("qa") && lower.includes("confidence"))) {
+
+  // --- QA results (internal — QA detail shown in draft panel) ---
+  if (lower.includes("qa review") && lower.includes("requirements passed")) {
     return { action: "suppress" }
   }
   if (lower.includes("this section passed") && lower.includes("approve")) {
     return { action: "suppress" }
   }
 
-  // --- Section approval prompts ---
-  // "**Introduction** ✅ Passed QA Review\n\nReview the section in the draft panel..."
-  // Condense to a short system message so the user knows a section is ready
+  // --- Section ready for review (QA passed → user needs to act) ---
   if (lower.includes("review the section in the draft panel") || lower.includes("review in the draft panel")) {
     const match = content.match(/\*\*(.+?)\*\*/)
     const section = match?.[1] ?? "Section"
     return { action: "system", replacement: `${section} ready for review` }
   }
-  if ((lower.includes("passed qa review") || lower.includes("requires human review")) && lower.includes("approve")) {
+  if ((lower.includes("passed qa review") || lower.includes("requires human review")) && (lower.includes("approve") || lower.includes("review"))) {
     const match = content.match(/\*\*(.+?)\*\*/)
     const section = match?.[1] ?? "Section"
     return { action: "system", replacement: `${section} ready for review` }
   }
 
-  // --- Section approval confirmations ---
-  // "Great! Introduction approved!", "All set! Major Duties approved!"
+  // --- Section approval confirmations (user-initiated → system message) ---
   if (lower.includes("approved!") || lower.includes("approved.")) {
-    return { action: "suppress" }
+    const match = content.match(/\*\*(.+?)\*\*/)
+    const section = match?.[1] ?? "Section"
+    return { action: "system", replacement: `${section} approved` }
   }
 
   // --- "Moving to next section: X" / "Moving to: X" ---
-  if (/^moving to(?: next section)?[:\s]/i.test(trimmed)) {
+  if (/moving to(?: next section)?[:\s]/i.test(lower)) {
     return { action: "suppress" }
+  }
+
+  // --- "Let me draft X" / "Let me revise X" (internal pipeline) ---
+  if (/let me (draft|revise|rewrite)/i.test(lower)) {
+    return { action: "suppress" }
+  }
+
+  // --- "Drafting X..." (next_prompt passthrough) ---
+  if (/^drafting\s/i.test(trimmed) && trimmed.length < 80) {
+    return { action: "suppress" }
+  }
+
+  // --- Revision acknowledgments (user-initiated → system message) ---
+  if (lower.includes("needs revision") && lower.includes("rewriting automatically")) {
+    const match = content.match(/\*\*(.+?)\*\*/)
+    const section = match?.[1] ?? "Section"
+    return { action: "system", replacement: `${section} being revised` }
   }
 
   // --- Draft content echoed in chat ---
@@ -84,16 +108,11 @@ function classifyAgentMessage(content: string): { action: "show" | "system" | "s
     const section = match?.[1] ?? "Section"
     return { action: "system", replacement: `${section} drafted` }
   }
-  if (lower.includes("let me know what you think")) {
-    const match = content.match(/let me know what you think[:\s]*(.+)/i)
-    const section = match?.[1]?.trim()
-    return { action: "system", replacement: section ? `${section} drafted` : "New section drafted" }
-  }
   // Emoji-prefixed content echo
   if (/^(📝|✅|✓)\s/.test(trimmed)) {
     return { action: "suppress" }
   }
-  // Full draft content leak (contains --- delimiters)
+  // Full draft content leak (contains --- delimiters and is long)
   if (content.includes("\n---\n") && content.length > 500) {
     const match = content.match(/\*\*(.+?)\*\*/)
     const section = match?.[1] ?? "Section"
@@ -105,6 +124,16 @@ function classifyAgentMessage(content: string): { action: "show" | "system" | "s
     return { action: "suppress" }
   }
 
+  // --- "Running QA review..." / "Revising..." next_prompt passthroughs ---
+  if (/^(running qa|revising|reviewing)/i.test(trimmed) && trimmed.length < 60) {
+    return { action: "suppress" }
+  }
+
+  // --- "Do you approve this section?" interrupt prompt ---
+  if (lower.includes("do you approve")) {
+    return { action: "suppress" }
+  }
+
   return { action: "show" }
 }
 
@@ -113,6 +142,7 @@ export function useWebSocket(sessionId: string | null) {
   const pingRef = useRef<ReturnType<typeof setInterval>>(null)
   const retryRef = useRef(0)
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout>>(null)
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null)
   // Track which session this socket belongs to so stale events are ignored
   const activeSessionRef = useRef<string | null>(null)
 
@@ -175,16 +205,23 @@ export function useWebSocket(sessionId: string | null) {
 
         switch (msg.type) {
           case "agent_message": {
+            // Reset typing timeout — backend is alive and streaming
+            if (typingTimeoutRef.current) {
+              clearTimeout(typingTimeoutRef.current)
+              typingTimeoutRef.current = setTimeout(() => {
+                setTyping(false)
+                addMessage("agent", "The response timed out. Please try sending your message again.", "system")
+                toast.warning("Response timed out")
+              }, TYPING_TIMEOUT)
+            }
             const data = msg.data as unknown as WSAgentMessage
             if (data.content) {
-              setTyping(false)
-
               // After interview, filter verbose agent messages
               const currentPhase = data.phase ?? useSessionStore.getState().state?.phase
               if (currentPhase === "requirements" || currentPhase === "drafting" || currentPhase === "review") {
                 const { action, replacement } = classifyAgentMessage(data.content)
                 if (action === "suppress") {
-                  // Don't add to chat at all
+                  // Don't add to chat — pipeline still running
                 } else if (action === "system") {
                   addMessage("agent", replacement ?? data.content, "system")
                 } else {
@@ -197,7 +234,10 @@ export function useWebSocket(sessionId: string | null) {
             if (data.phase) {
               updateState({ phase: data.phase })
             }
-            if (data.phase === "drafting" || data.phase === "review") {
+            // Don't fetchDraft on every agent_message during streaming —
+            // element_update WS messages handle real-time updates.
+            // Only fetch on phase transitions to sync full state.
+            if (data.phase && (data.phase === "drafting" || data.phase === "review" || data.phase === "complete")) {
               fetchDraft(sessionId)
             }
             break
@@ -224,7 +264,15 @@ export function useWebSocket(sessionId: string | null) {
             })
             break
           }
+          case "done": {
+            // Single source of truth: backend signals processing complete.
+            // This is the ONLY place typing gets turned off during normal flow.
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+            setTyping(false)
+            break
+          }
           case "stopped": {
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
             setTyping(false)
             addMessage("agent", "Processing stopped.", "system")
             if (msg.data && Object.keys(msg.data).length > 0) {
@@ -234,6 +282,7 @@ export function useWebSocket(sessionId: string | null) {
           }
           case "error": {
             if (activeSessionRef.current !== sessionId) break
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
             const errMsg = (msg.data as { message?: string }).message ?? "Unknown error"
             addMessage("agent", `Error: ${errMsg}`)
             toast.error("Something went wrong", { description: errMsg })
@@ -247,6 +296,8 @@ export function useWebSocket(sessionId: string | null) {
 
       ws.onclose = () => {
         if (pingRef.current) clearInterval(pingRef.current)
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+        setTyping(false)
 
         // Don't reconnect if session changed
         if (activeSessionRef.current !== sessionId) return
@@ -271,6 +322,7 @@ export function useWebSocket(sessionId: string | null) {
     return () => {
       activeSessionRef.current = null
       if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current)
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
       if (pingRef.current) clearInterval(pingRef.current)
       if (wsRef.current) {
         wsRef.current.onclose = null
@@ -292,6 +344,13 @@ export function useWebSocket(sessionId: string | null) {
         }
         ws.send(JSON.stringify({ type: "user_message", data }))
         setTyping(true)
+        // Safety timeout: if backend never sends "done", clear typing after 90s
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+        typingTimeoutRef.current = setTimeout(() => {
+          setTyping(false)
+          addMessage("agent", "The response timed out. Please try sending your message again.", "system")
+          toast.warning("Response timed out")
+        }, TYPING_TIMEOUT)
         return true
       }
       return false

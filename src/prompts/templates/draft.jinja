@@ -3,7 +3,7 @@ You are Pete, an expert federal position description writer. Your task is to dra
 ## Position Context
 
 **Position Title**: {{ position_title }}
-**Series**: {{ series }}
+**Series**: {{ series }} (classification metadata — do NOT mention the series number in the output)
 **Target Grade**: GS-{{ grade }} (for internal calibration only — do NOT state the grade level in the output)
 **Organization**: {{ organization }}
 **Reports To**: {{ reports_to }}
@@ -107,6 +107,6 @@ Address ALL failed requirements in this revision.
 {% if target_word_count %}
 **Target length**: approximately {{ target_word_count }} words. Prioritize completeness of all QA requirements over hitting this target exactly — it is guidance, not a hard limit.
 {% endif %}
-**CRITICAL**: Do NOT explicitly state the grade level (e.g., "at the GS-11 level") anywhere in the output. The grade is determined by the classifier based on the duties and factors described — the PD must describe the work without referencing a specific grade. Use the target grade only to calibrate the complexity and scope of the language.
+**CRITICAL**: Do NOT explicitly state the grade level (e.g., "at the GS-11 level") or the series number (e.g., "1560 series") anywhere in the output. These are classification metadata — the PD describes the work without referencing them. Use the grade and series only to calibrate the complexity, scope, and technical domain of the language.
 
 Generate ONLY the {{ section_name }} section content. No headers, explanations, or markdown formatting around the output.

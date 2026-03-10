@@ -193,7 +193,7 @@ def finalize_node(state: AgentState) -> dict:
 
 
 @traced_node
-def handle_element_revision_request(state: AgentState) -> dict:
+async def handle_element_revision_request(state: AgentState) -> dict:
     """
     Handle a request to revise a specific element during review phase.
 
@@ -235,10 +235,7 @@ def handle_element_revision_request(state: AgentState) -> dict:
     ]
 
     # Use LLM to identify the target element (NO HEURISTICS)
-    from src.utils.async_compat import run_async
-    extraction_result = run_async(
-        _extract_target_element(feedback, available_elements)
-    )
+    extraction_result = await _extract_target_element(feedback, available_elements)
     
     element_name = extraction_result.element_name
     

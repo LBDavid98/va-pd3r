@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 RouteDestination = Literal[
     "init",
     "user_input",
+    "reprompt",  # Generate clarification message before re-interrupting
     "classify_intent",
     "start_interview",
     "map_answers",
@@ -115,10 +116,10 @@ def _route_init_phase(intent: str, state: AgentState) -> RouteDestination:
         field_mappings = state.get("_field_mappings", [])
         if field_mappings:
             return "map_answers"
-        # No actual field data extracted - treat as needing clarification
-        # Don't start interview on ambiguous "provide_information"
-        return "user_input"
-    
+        # No actual field data extracted — start the interview anyway.
+        # The user is engaging, so move forward rather than re-prompting.
+        return "start_interview"
+
     if intent == "confirm":
         return "start_interview"
 
@@ -128,8 +129,8 @@ def _route_init_phase(intent: str, state: AgentState) -> RouteDestination:
     if intent == "ask_question":
         return "answer_question"
 
-    # For unrecognized or other intents, re-prompt 
-    return "user_input"
+    # For unrecognized or other intents, generate clarification message
+    return "reprompt"
 
 
 def _route_interview_phase(intent: str, state: AgentState) -> RouteDestination:
@@ -175,7 +176,8 @@ def _route_interview_phase(intent: str, state: AgentState) -> RouteDestination:
     if intent == "modify_answer":
         return "map_answers"
 
-    return "user_input"
+    # Unrecognized intent during interview — ask user to rephrase
+    return "reprompt"
 
 
 def _route_requirements_phase(intent: str) -> RouteDestination:
@@ -217,8 +219,8 @@ def _route_requirements_phase(intent: str) -> RouteDestination:
         # User providing additional info - treat as modification
         return "map_answers"
 
-    # Default - wait for clear confirmation
-    return "user_input"
+    # Default - ask for clear confirmation
+    return "reprompt"
 
 
 def _route_drafting_phase(intent: str, state: AgentState) -> RouteDestination:
@@ -237,8 +239,8 @@ def _route_drafting_phase(intent: str, state: AgentState) -> RouteDestination:
     if intent == "provide_information":
         return "handle_element_revision"
 
-    # Default - stay on user input for clarification
-    return "user_input"
+    # Default - generate clarification message
+    return "reprompt"
 
 
 def _route_review_phase(intent: str) -> RouteDestination:
@@ -271,7 +273,7 @@ def _route_review_phase(intent: str) -> RouteDestination:
     if intent == "provide_information":
         return "handle_element_revision"
 
-    return "user_input"
+    return "reprompt"
 
 
 def _route_complete_phase(intent: str, state: AgentState) -> RouteDestination:
@@ -321,8 +323,8 @@ def _route_complete_phase(intent: str, state: AgentState) -> RouteDestination:
     if intent == "ask_question":
         return "answer_question"
 
-    # Default - stay on user input for clarification
-    return "user_input"
+    # Default - generate clarification message
+    return "reprompt"
 
 
 def route_after_init(state: AgentState) -> RouteDestination:
@@ -391,14 +393,18 @@ def route_after_advance_element(state: AgentState) -> RouteDestination:
     phase = state.get("phase", "")
 
     if phase == "drafting":
-        # If the current element is already qa_passed, present directly to user
-        # instead of cycling through generate→QA needlessly.
         element_index = state.get("current_element_index", 0)
         draft_elements = state.get("draft_elements", [])
         if draft_elements and element_index < len(draft_elements):
             status = draft_elements[element_index].get("status")
+            # Already QA'd — present directly to user for approval
             if status == "qa_passed":
                 return "user_input"
+            # Already drafted (e.g. batch-generated) but not yet QA'd — run QA
+            if status == "drafted":
+                if SKIP_QA:
+                    return "user_input"
+                return "qa_review"
         return "generate_element"
 
     if phase == "review":

@@ -100,7 +100,7 @@ class TestHandleElementRevisionRequest:
     """
 
     @skip_without_llm
-    def test_identifies_introduction_from_message(self):
+    async def test_identifies_introduction_from_message(self):
         """Should identify introduction element from user message."""
         elements = [
             DraftElement(
@@ -125,14 +125,14 @@ class TestHandleElementRevisionRequest:
             "messages": [HumanMessage(content="Change the introduction to be more formal")],
         }
 
-        result = handle_element_revision_request(state)
+        result = await handle_element_revision_request(state)
 
         assert result["current_element_name"] == "introduction"
         assert result["current_element_index"] == 0
         assert result["phase"] == "drafting"
 
     @skip_without_llm
-    def test_identifies_factor_from_message(self):
+    async def test_identifies_factor_from_message(self):
         """Should identify factor elements from user message."""
         elements = [
             DraftElement(
@@ -150,13 +150,13 @@ class TestHandleElementRevisionRequest:
             "messages": [HumanMessage(content="Revise factor 1")],
         }
 
-        result = handle_element_revision_request(state)
+        result = await handle_element_revision_request(state)
 
         assert result["current_element_name"] == "factor_1_knowledge"
         assert result["current_element_index"] == 0
 
     @skip_without_llm
-    def test_asks_clarification_when_element_unclear(self):
+    async def test_asks_clarification_when_element_unclear(self):
         """Should ask for clarification when element can't be identified from vague request."""
         # Need multiple elements so "make some changes" is actually ambiguous
         elements = [
@@ -187,7 +187,7 @@ class TestHandleElementRevisionRequest:
             "messages": [HumanMessage(content="Make some changes")],
         }
 
-        result = handle_element_revision_request(state)
+        result = await handle_element_revision_request(state)
 
         # Should ask for clarification when request is vague with multiple options
         # Either asks which section OR has low confidence and asks
@@ -198,7 +198,7 @@ class TestHandleElementRevisionRequest:
                f"Expected clarification request, got: {result['messages'][0].content}"
 
     @skip_without_llm
-    def test_marks_element_for_revision(self):
+    async def test_marks_element_for_revision(self):
         """Should mark the identified element for revision."""
         elements = [
             DraftElement(
@@ -216,7 +216,7 @@ class TestHandleElementRevisionRequest:
             "messages": [HumanMessage(content="Add more detail to major duties")],
         }
 
-        result = handle_element_revision_request(state)
+        result = await handle_element_revision_request(state)
 
         # Check that element was marked for revision
         updated_elements = result["draft_elements"]

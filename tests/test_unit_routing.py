@@ -83,13 +83,13 @@ class TestInitPhaseRouting:
 
         assert result == "map_answers"
 
-    def test_provide_info_without_mappings_goes_to_user_input(self):
-        """Providing info without field mappings routes to user_input for clarification."""
+    def test_provide_info_without_mappings_starts_interview(self):
+        """Providing info without field mappings starts interview (user is engaging)."""
         state = {"last_intent": "provide_information", "phase": "init"}
 
         result = route_by_intent(state)
 
-        assert result == "user_input"
+        assert result == "start_interview"
 
     def test_reject_goes_to_end(self):
         """Reject in init phase ends conversation."""
@@ -231,13 +231,13 @@ class TestRequirementsPhaseRouting:
 
         assert result == "map_answers"
 
-    def test_unrecognized_goes_to_user_input(self):
-        """Unrecognized intent in requirements waits for confirmation."""
+    def test_unrecognized_goes_to_reprompt(self):
+        """Unrecognized intent in requirements generates clarification."""
         state = {"last_intent": "unrecognized", "phase": "requirements"}
 
         result = route_by_intent(state)
 
-        assert result == "user_input"
+        assert result == "reprompt"
 
     def test_system_commands_still_work(self):
         """System commands take precedence in requirements phase."""
@@ -298,13 +298,13 @@ class TestDraftingPhaseRouting:
 
         assert result == "handle_element_revision"
 
-    def test_unrecognized_goes_to_user_input(self):
-        """Unrecognized intent in drafting stays on user_input."""
+    def test_unrecognized_goes_to_reprompt(self):
+        """Unrecognized intent in drafting generates clarification."""
         state = {"last_intent": "unrecognized", "phase": "drafting", "draft_elements": []}
 
         result = route_by_intent(state)
 
-        assert result == "user_input"
+        assert result == "reprompt"
 
 
 class TestReviewPhaseRouting:
@@ -706,13 +706,13 @@ class TestReviewPhaseRouting:
 
         assert result == "answer_question"
 
-    def test_unrecognized_routes_to_user_input(self):
-        """Unrecognized intent in review waits for clarification."""
+    def test_unrecognized_routes_to_reprompt(self):
+        """Unrecognized intent in review generates clarification."""
         state = {"last_intent": "unrecognized", "phase": "review"}
 
         result = route_by_intent(state)
 
-        assert result == "user_input"
+        assert result == "reprompt"
 
 
 class TestRouteAfterFinalize:
@@ -811,6 +811,23 @@ class TestRouteAfterAdvanceElementReview:
 
         assert result == "generate_element"
 
+    def test_drafted_element_routes_to_qa_review(self):
+        """Already-drafted elements should go to QA, not be regenerated."""
+        from src.models.draft import DraftElement
+        elem = DraftElement(name="major_duties", display_name="Major Duties")
+        elem.update_content("Some drafted content")
+        assert elem.status == "drafted"
+
+        state = {
+            "phase": "drafting",
+            "current_element_index": 0,
+            "draft_elements": [elem.model_dump()],
+        }
+
+        result = route_after_advance_element(state)
+
+        assert result == "qa_review"
+
     def test_complete_phase_routes_to_end(self):
         """When complete, route to end_conversation."""
         state = {"phase": "complete"}
@@ -847,13 +864,13 @@ class TestCompletePhaseRouting:
 
         assert result == "answer_question"
 
-    def test_unknown_intent_routes_to_user_input(self):
-        """Unknown intents in complete phase go to user_input."""
+    def test_unknown_intent_routes_to_reprompt(self):
+        """Unknown intents in complete phase generate clarification."""
         state = {"last_intent": "provide_information", "phase": "complete"}
 
         result = route_by_intent(state)
 
-        assert result == "user_input"
+        assert result == "reprompt"
 
 
 class TestRouteAfterEndConversation:

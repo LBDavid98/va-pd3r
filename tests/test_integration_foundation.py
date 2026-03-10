@@ -57,13 +57,13 @@ class TestFoundationIntegration:
         assert "Pete" in first_message.content
         assert "Position Description" in first_message.content or "PD" in first_message.content
 
-    def test_can_handle_yes_confirmation(self, graph, config):
+    async def test_can_handle_yes_confirmation(self, graph, config):
         """Test: "yes" response routes to start_interview."""
         # First invocation - gets greeting, pauses at user_input
         graph.invoke(get_initial_state(), config=config)
 
-        # Resume with "yes"
-        graph.invoke(Command(resume="yes"), config=config)
+        # Resume with "yes" — async because classify_intent is async
+        await graph.ainvoke(Command(resume="yes"), config=config)
 
         # Check state after processing "yes"
         state = graph.get_state(config)
@@ -75,16 +75,16 @@ class TestFoundationIntegration:
         assert len(state.values.get("messages", [])) >= 2
 
     @pytest.mark.llm
-    def test_can_handle_no_rejection(self, graph, config, skip_without_api_key):
+    async def test_can_handle_no_rejection(self, graph, config, skip_without_api_key):
         """Test: "no" response ends conversation gracefully.
-        
+
         Requires LLM: Invokes intent_classification_node.
         """
         # First invocation - gets greeting, pauses at user_input
         graph.invoke(get_initial_state(), config=config)
 
         # Resume with "no" - this rejects the help offer
-        result = graph.invoke(Command(resume="no"), config=config)
+        await graph.ainvoke(Command(resume="no"), config=config)
 
         # Check state after processing "no"
         state = graph.get_state(config)
@@ -98,7 +98,7 @@ class TestFoundationIntegration:
         assert "write another" in state.values.get("next_prompt", "").lower()
 
         # Now respond "no" to "write another?" prompt
-        graph.invoke(Command(resume="no"), config=config)
+        await graph.ainvoke(Command(resume="no"), config=config)
         state = graph.get_state(config)
 
         # Now should_end should be True
@@ -106,16 +106,16 @@ class TestFoundationIntegration:
         assert state.values.get("wants_another") is False
 
     @pytest.mark.llm
-    def test_can_handle_quit_command(self, graph, config, skip_without_api_key):
+    async def test_can_handle_quit_command(self, graph, config, skip_without_api_key):
         """Test: "quit" command ends conversation from any point.
-        
+
         Requires LLM: Invokes intent_classification_node.
         """
         # First invocation
         graph.invoke(get_initial_state(), config=config)
 
         # Resume with "quit"
-        graph.invoke(Command(resume="quit"), config=config)
+        await graph.ainvoke(Command(resume="quit"), config=config)
 
         state = graph.get_state(config)
 
@@ -125,13 +125,13 @@ class TestFoundationIntegration:
         assert "write another" in state.values.get("next_prompt", "").lower()
 
         # Respond "no" to "write another?"
-        graph.invoke(Command(resume="no"), config=config)
+        await graph.ainvoke(Command(resume="no"), config=config)
         state = graph.get_state(config)
 
         assert state.values.get("should_end") is True
         assert state.values.get("wants_another") is False
 
-    def test_checkpointer_saves_state(self, graph, config):
+    async def test_checkpointer_saves_state(self, graph, config):
         """Test: State is persisted across invocations."""
         # First invocation
         graph.invoke(get_initial_state(), config=config)
@@ -140,8 +140,8 @@ class TestFoundationIntegration:
         state1 = graph.get_state(config)
         messages_count_1 = len(state1.values.get("messages", []))
 
-        # Resume with response
-        graph.invoke(Command(resume="yes"), config=config)
+        # Resume with response — async because classify_intent is async
+        await graph.ainvoke(Command(resume="yes"), config=config)
 
         # Get new state
         state2 = graph.get_state(config)
@@ -154,19 +154,19 @@ class TestFoundationIntegration:
         history = list(graph.get_state_history(config))
         assert len(history) >= 2
 
-    def test_restart_command_resets_state(self, graph, config):
+    async def test_restart_command_resets_state(self, graph, config):
         """Test: "restart" command reinitializes the conversation."""
         # First invocation
         graph.invoke(get_initial_state(), config=config)
 
         # Say yes to start
-        graph.invoke(Command(resume="yes"), config=config)
+        await graph.ainvoke(Command(resume="yes"), config=config)
 
         state_before = graph.get_state(config)
         assert state_before.values.get("last_intent") == "confirm"
 
         # Request restart
-        graph.invoke(Command(resume="restart"), config=config)
+        await graph.ainvoke(Command(resume="restart"), config=config)
 
         state_after = graph.get_state(config)
 
@@ -191,7 +191,7 @@ class TestMessageFlow:
         """Thread config."""
         return {"configurable": {"thread_id": "test-thread-2"}}
 
-    def test_messages_accumulate_correctly(self, graph, config):
+    async def test_messages_accumulate_correctly(self, graph, config):
         """Test: Messages from user and agent accumulate in order."""
         from langchain_core.messages import AIMessage, HumanMessage
 
@@ -203,8 +203,8 @@ class TestMessageFlow:
         assert len(state1.values["messages"]) >= 1
         assert isinstance(state1.values["messages"][0], AIMessage)
 
-        # User responds
-        graph.invoke(Command(resume="I need help with a PD"), config=config)
+        # User responds — async because classify_intent is async
+        await graph.ainvoke(Command(resume="I need help with a PD"), config=config)
         state2 = graph.get_state(config)
 
         # Should now have AI greeting + Human response
@@ -306,7 +306,7 @@ class TestRewriteContext:
 
         # Verify template renders key content
         assert "Major Duties" in prompt
-        assert "REWRITE ATTEMPT 2" in prompt
+        assert "attempt 2" in prompt
         assert "Missing supervisory statement" in prompt
 
     def test_model_escalation_on_rewrite(self):

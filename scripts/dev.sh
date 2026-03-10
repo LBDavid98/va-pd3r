@@ -19,8 +19,8 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-echo "Starting PD3r backend on :8000 ..."
-poetry run pd3r-api &
+echo "Starting PD3r backend on :8000 (tracing enabled) ..."
+PD3R_TRACING=true poetry run pd3r-api &
 API_PID=$!
 
 echo "Starting frontend on :${FRONTEND_PORT} ..."

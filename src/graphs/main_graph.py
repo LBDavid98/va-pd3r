@@ -40,6 +40,7 @@ from src.nodes import (
     user_input_node,
 )
 from src.nodes.handle_write_another_node import handle_write_another_node
+from src.nodes.reprompt_node import reprompt_node
 
 logger = logging.getLogger(__name__)
 
@@ -80,6 +81,9 @@ def build_graph() -> StateGraph:
     # Error recovery node - centralized error handling
     builder.add_node("error_handler", error_handler_node)
 
+    # Reprompt node - generates clarification when intent is unrecognized
+    builder.add_node("reprompt", reprompt_node)
+
     # Entry point
     builder.add_edge(START, "init")
 
@@ -102,6 +106,7 @@ def build_graph() -> StateGraph:
         {
             "init": "init",
             "user_input": "user_input",
+            "reprompt": "reprompt",  # Unrecognized intent → clarification message
             "end_conversation": "end_conversation",
             "error_handler": "error_handler",  # Error recovery
             # Phase 2 nodes
@@ -127,6 +132,9 @@ def build_graph() -> StateGraph:
 
     # After answering a question, go back to user_input
     builder.add_edge("answer_question", "user_input")
+
+    # After reprompt (clarification message), wait for user input
+    builder.add_edge("reprompt", "user_input")
 
     # After preparing next, go to user_input
     builder.add_edge("prepare_next", "user_input")
@@ -178,6 +186,7 @@ def build_graph() -> StateGraph:
         route_after_advance_element,
         {
             "generate_element": "generate_element",
+            "qa_review": "qa_review",  # Already drafted, needs QA
             "user_input": "user_input",  # qa_passed elements skip generation
             "finalize": "finalize",  # All elements done - go to final review
             "end_conversation": "end_conversation",

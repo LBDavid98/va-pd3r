@@ -190,6 +190,7 @@ def _enforce_confidence_thresholds(
     return qa_review, passes, needs_rewrite
 
 
+@traced_node
 async def qa_review_node(state: AgentState) -> dict:
     """
     QA review of all prerequisite-ready draft elements (parallel).
@@ -339,43 +340,22 @@ async def qa_review_node(state: AgentState) -> dict:
         passed_count = qa_review.passed_count
         total_count = len(qa_review.check_results)
 
-        # Start with the draft content so user can see what they're approving
-        lines = [
-            f"📝 **{element.display_name}**",
-            "",
-            "---",
-            element.content if element.content else "(No content generated)",
-            "---",
-            "",
-            f"{status_emoji} QA Review: {passed_count}/{total_count} requirements passed ({conf:.0%} confidence)",
-            "",
-            f"**Feedback**: {qa_review.overall_feedback}",
-        ]
-
-        if not qa_review.passes:
-            failed = [c for c in qa_review.check_results if not c.passed]
-            if failed:
-                lines.append("")
-                lines.append("**Failed Checks**:")
-                for check in failed:
-                    lines.append(f"  - [{check.severity}] {check.requirement_id}: {check.explanation}")
-
+        # Concise chat message — full content is visible in the draft panel
         if qa_review.passes:
-            lines.extend(["", "✅ This section passed QA. Do you approve it?"])
+            msg = f"**{element.display_name}** ✅ Passed QA Review\n\nReview the section in the draft panel and approve or request changes."
             if idx == primary_index:
                 next_prompt = "Do you approve this section?"
         elif element.can_rewrite:
-            lines.extend(["", f"🔄 This section needs revision. Attempting automatic rewrite (attempt {element.revision_count + 1}/1)..."])
+            msg = f"**{element.display_name}** needs revision — rewriting automatically (attempt {element.revision_count + 1})..."
         else:
-            lines.extend([
-                "",
-                "⚠️ This section did not fully pass QA, but we've reached the rewrite limit.",
-                "Please review and either approve or provide feedback for manual revision.",
-            ])
+            msg = (
+                f"**{element.display_name}** did not fully pass QA (rewrite limit reached).\n\n"
+                "Review in the draft panel and approve or provide feedback."
+            )
             if idx == primary_index:
                 next_prompt = "Do you approve this section, or provide feedback for changes?"
 
-        messages.append(AIMessage(content="\n".join(lines)))
+        messages.append(AIMessage(content=msg))
 
     return {
         "messages": messages,
@@ -386,9 +366,5 @@ async def qa_review_node(state: AgentState) -> dict:
     }
 
 
-# Synchronous wrapper
-@traced_node
-def qa_review_node_sync(state: AgentState) -> dict:
-    """Synchronous wrapper for qa_review_node."""
-    from src.utils.async_compat import run_async
-    return run_async(qa_review_node(state))
+# Keep alias for backwards compatibility with imports
+qa_review_node_sync = qa_review_node

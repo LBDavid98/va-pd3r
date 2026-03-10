@@ -1,6 +1,6 @@
 # PD3r Documentation Index
 
-> **Last Updated**: 2026-03-05
+> **Last Updated**: 2026-03-10
 > **Nickname**: Pete  
 > **Purpose**: Chat agent that writes federal position descriptions using LangGraph
 
@@ -46,6 +46,7 @@ See [plans/mvp_roadmap.md](plans/mvp_roadmap.md) for current roadmap.
 | Phase 3: React UX | ✅ Complete | Two-panel chat + product layout |
 | Phase 4: UX Polish | ✅ Complete | Drafting fixes, intent classification improvements |
 | Phase 5: Handoff | 🔄 Current | Documentation, cleanup, deployment prep |
+| **Arch Remediation** | 🔄 Planned | [architectural_remediation.md](plans/architectural_remediation.md) |
 
 ---
 

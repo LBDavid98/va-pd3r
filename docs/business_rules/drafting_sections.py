@@ -2,9 +2,8 @@ from typing import Dict, List, Literal, Optional
 
 # Generation tier definitions:
 # - "literal": Fixed text, no LLM call needed (Factor 8, Factor 9)
-# - "procedural": Template-based generation using interview data (intro, background)
-# - "llm": Full LLM generation required (duties, factors 1-7)
-GenerationTier = Literal["literal", "procedural", "llm"]
+# - "llm": Full LLM generation required (all narrative sections)
+GenerationTier = Literal["literal", "llm"]
 
 SECTION_REGISTRY: Dict[str, Dict] = {
     "introduction": {
@@ -13,16 +12,16 @@ SECTION_REGISTRY: Dict[str, Dict] = {
         "style": "narrative",
         "batch": "introduction_duties",
         "prompt_key": "INTRO_PROMPT",
-        "generation_tier": "procedural",  # Template + interview data
+        "generation_tier": "llm",  # Full LLM generation
     },
-    
+
     "background": {
         "description": "Background section providing organizational context and mission alignment",
         "requires": ["organization_hierarchy", "position_title", "series", "grade"],
         "style": "narrative",
         "batch": "introduction_duties",
         "prompt_key": "BACKGROUND_PROMPT",
-        "generation_tier": "procedural",  # Template + interview data
+        "generation_tier": "llm",  # Full LLM generation
     },
     
     "duties_overview": {
@@ -206,10 +205,9 @@ def get_sections_by_prompt(prompt_key: str) -> List[str]:
 def get_generation_tier(section_id: str) -> GenerationTier:
     """
     Get the generation tier for a section.
-    
+
     Returns:
         "literal" - Fixed text, no LLM call needed
-        "procedural" - Template-based generation using interview data
         "llm" - Full LLM generation required (default)
     """
     section_config = SECTION_REGISTRY.get(section_id, {})

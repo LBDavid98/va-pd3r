@@ -27,7 +27,7 @@ You are drafting the **Introduction** section of a federal position description.
 
 Write a polished introduction paragraph (3-5 sentences) for this federal position description that:
 
-1. Opens with the official position title and series (do NOT mention the grade level — the classifier determines that)
+1. Opens with the official position title (do NOT mention the series number or grade level — those are classification metadata, not part of the narrative)
 2. Identifies the hiring unit first (the lowest-level office), then places it within the broader organizational hierarchy in a narrative way — do NOT just list the hierarchy; weave it into the prose (e.g., "within the Digital Health Office, under the Veterans Health Administration")
 3. Describes the position's primary purpose and how it supports the organization's mission
 {% if mission_text %}
@@ -57,6 +57,6 @@ Write a polished introduction paragraph (3-5 sentences) for this federal positio
 {% if target_word_count %}
 **Target length**: approximately {{ target_word_count }} words. Prioritize completeness of all requirements over hitting this target exactly — it is guidance, not a hard limit.
 {% endif %}
-**CRITICAL**: Do NOT explicitly state the grade level (e.g., "at the GS-11 level") anywhere in the output. The grade is determined by the classifier — the PD describes the work without referencing a specific grade.
+**CRITICAL**: Do NOT explicitly state the grade level (e.g., "at the GS-11 level") or the series number (e.g., "1560 series") anywhere in the output. The grade and series are classification metadata determined by HR — the PD introduction describes the work and organizational context without referencing them.
 
 Generate the Introduction section now. Output ONLY the introduction text, no markdown headers or explanations.

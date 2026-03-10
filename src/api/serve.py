@@ -20,7 +20,9 @@ def main():
     file_handler = RotatingFileHandler(
         "output/logs/api.log", maxBytes=5_000_000, backupCount=3
     )
-    file_handler.setLevel(logging.WARNING)
+    # Use INFO when tracing is enabled, WARNING otherwise
+    from src.constants import TRACING
+    file_handler.setLevel(logging.INFO if TRACING else logging.WARNING)
     file_handler.setFormatter(logging.Formatter(
         "%(asctime)s %(name)s %(levelname)s %(message)s"
     ))

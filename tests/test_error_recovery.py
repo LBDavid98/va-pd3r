@@ -214,11 +214,7 @@ class TestGenerateElementNodeErrorHandling:
 
     @pytest.mark.asyncio
     async def test_llm_error_sets_last_error(self):
-        """LLM error during generation sets last_error.
-        
-        Note: This test uses duties_overview (LLM tier) because introduction
-        and background now use procedural generation (no LLM call).
-        """
+        """LLM error during generation sets last_error."""
         from src.nodes.generate_element_node import generate_element_node
         
         # Create a minimal valid state with draft elements

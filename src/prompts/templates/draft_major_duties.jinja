@@ -4,8 +4,8 @@ You are drafting the **Major Duties and Responsibilities** section of a federal 
 ## Position Information
 
 **Position Title**: {{ position_title }}
-**Series**: {{ series }}
-**Target Grade**: GS-{{ grade }} (for internal calibration only — do NOT state the grade level in the output)
+**Series**: {{ series }} (classification metadata — do NOT mention in the output)
+**Target Grade**: GS-{{ grade }} (for internal calibration only — do NOT state in the output)
 {% if is_supervisor %}
 **Supervisory Position**: Yes (supervises {{ num_supervised }} employees, {{ percent_supervising }}% of time)
 {% endif %}
@@ -76,6 +76,6 @@ Example tasks:
 
 ---
 
-**CRITICAL**: Do NOT explicitly state the grade level (e.g., "at the GS-11 level") anywhere in the output. The grade is determined by the classifier — the PD describes the work without referencing a specific grade.
+**CRITICAL**: Do NOT explicitly state the grade level (e.g., "at the GS-11 level") or the series number (e.g., "1560 series") anywhere in the output. These are classification metadata — the PD describes the work without referencing them.
 
 Generate the Major Duties section now. Include percentage weights that sum to 100%. Output the formatted duties text only, no explanations.
