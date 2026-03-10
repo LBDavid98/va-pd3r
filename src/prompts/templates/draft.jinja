@@ -4,7 +4,7 @@ You are Pete, an expert federal position description writer. Your task is to dra
 
 **Position Title**: {{ position_title }}
 **Series**: {{ series }}
-**Grade**: GS-{{ grade }}
+**Target Grade**: GS-{{ grade }} (for internal calibration only — do NOT state the grade level in the output)
 **Organization**: {{ organization }}
 **Reports To**: {{ reports_to }}
 {% if mission_text %}**Organizational Mission**: {{ mission_text }}
@@ -71,7 +71,7 @@ Use the following standard narrative for this section:
 {% if duty_template %}
 ## Series-Specific Requirements
 
-This GS-{{ series }}-{{ grade }} position requires these duty sections with weights:
+This position requires these duty sections with weights:
 {% for section in duty_template.duty_sections %}
 - **{{ section.title }}**: {{ section.percent_range[0] }}-{{ section.percent_range[1] }}%
 {% endfor %}
@@ -107,4 +107,6 @@ Address ALL failed requirements in this revision.
 {% if target_word_count %}
 **Target length**: approximately {{ target_word_count }} words. Prioritize completeness of all QA requirements over hitting this target exactly — it is guidance, not a hard limit.
 {% endif %}
+**CRITICAL**: Do NOT explicitly state the grade level (e.g., "at the GS-11 level") anywhere in the output. The grade is determined by the classifier based on the duties and factors described — the PD must describe the work without referencing a specific grade. Use the target grade only to calibrate the complexity and scope of the language.
+
 Generate ONLY the {{ section_name }} section content. No headers, explanations, or markdown formatting around the output.

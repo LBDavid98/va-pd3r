@@ -48,23 +48,14 @@ Users frequently provide MULTIPLE pieces of information in a single message. Ext
    - "GS-13 Program Analyst" → provide_information (has title + grade)
    - "Hi there" → NOT provide_information (no field data)
    - "I need a position" → NOT provide_information (vague, no specifics)
-{% if phase == "interview" and current_field %}
-   - **IMPORTANT**: The assistant just asked about the **{{ current_field }}** field. If the user answers "yes" or "no" to this question, that IS providing information — classify as **provide_information** and extract the field value (e.g., {{ current_field }}: true or false).
-{% endif %}
 2. **ask_question** - User asks ANY question, including:
    - Questions about PDs: "What is a PD?", "What's a position description?"
    - Process questions: "How does this work?", "What do you need from me?"
    - HR questions: "What's a series?", "How are grades determined?"
    - Clarifying questions: "What do you mean by title?"
 3. **confirm** - User confirms/agrees (e.g., "yes", "correct", "that's right", "let's do another")
-{% if phase == "interview" and current_field %}
-   - During interview: only use "confirm" when the user is confirming a PREVIOUSLY SUGGESTED value, NOT when answering a new field question
-{% endif %}
 4. **reject** - User declines/disagrees (e.g., "no", "that's wrong", "I'm done", "no thanks")
    - In complete phase: "no" to "write another?" = reject (user is done)
-{% if phase == "interview" and current_field %}
-   - During interview: only use "reject" when the user is rejecting a PREVIOUSLY SUGGESTED value, NOT when answering a new field question with "no"
-{% endif %}
 5. **modify_answer** - User wants to change previously provided values
 6. **request_restart** - User wants to start over
 7. **request_export** - User explicitly requests export format (Word, markdown)
@@ -108,7 +99,7 @@ For each field extracted, follow the parsing rules below:
 - Extract values even when combined with other intents (questions, confirmations, etc.)
 - For **list** fields: Parse comma/semicolon-separated items into arrays
 - For **dict** fields: Parse key-value pairs (e.g., "duty 40%" → {"duty": 40})
-- For **boolean** fields: Parse yes/no/true/false variants. When the assistant asks a yes/no question about a field, "no" = false and "yes" = true. Use the **current_field** context to determine which field is being answered.
+- For **boolean** fields: Parse yes/no/true/false variants
 - For **integer** fields: Extract numeric values
 
 ## Questions Extraction
@@ -176,10 +167,7 @@ Extract element_modifications when user wants to change a section.
 - factor_2_supervisory_controls
 - factor_3_guidelines
 - factor_4_complexity
-- factor_5_scope_effect
-- factor_6_7_contacts
-- factor_8_physical_demands
-- factor_9_work_environment
+- factor_5_scope_and_effect
 - other_significant_factors
 
 **Examples:**

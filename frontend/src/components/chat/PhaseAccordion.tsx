@@ -13,11 +13,12 @@
  *
  * The currently-active phase auto-expands when the phase changes.
  */
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { CheckCircle, Circle, Loader2, Download, ChevronUp, ChevronDown, Plus, X, PencilLine } from "lucide-react"
 import { useSessionStore } from "@/stores/sessionStore"
 import { useDraftStore } from "@/stores/draftStore"
 import { exportDocument } from "@/api/client"
+import { getDefaultOrgList, getMissionText } from "@/components/layout/SettingsDialog"
 import { buildFilename } from "@/hooks/useExport"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -32,9 +33,43 @@ import {
 } from "@/components/ui/accordion"
 import { InterviewFieldList } from "./InterviewFieldList"
 
+/**
+ * Compute the display phase from backend phase + element statuses.
+ *
+ * Backend phase drives graph routing but the status bar should reflect
+ * actual deliverable progress:
+ *   - "review"   once ALL elements reach qa_passed/approved/locked
+ *   - "complete"  once ALL elements are approved/locked (ready to download)
+ */
+function useDisplayPhase(): Phase {
+  const backendPhase = useSessionStore((s) => s.phase)
+  const elements = useDraftStore((s) => s.elements)
+
+  return useMemo(() => {
+    // Only override during drafting/review phases when elements exist
+    if (!["drafting", "review"].includes(backendPhase) || elements.length === 0) {
+      return backendPhase
+    }
+
+    // All approved/locked → complete
+    const allApproved = elements.every(
+      (e) => e.status === "approved" || e.locked,
+    )
+    if (allApproved) return "complete"
+
+    // All have been QA'd (qa_passed, approved, locked) → review
+    const allDelivered = elements.every(
+      (e) => e.status === "qa_passed" || e.status === "approved" || e.locked,
+    )
+    if (allDelivered) return "review"
+
+    return backendPhase
+  }, [backendPhase, elements])
+}
+
 /** Workflow stepper showing all phases with expandable detail panels. */
 export function PhaseAccordion() {
-  const phase = useSessionStore((s) => s.phase)
+  const phase = useDisplayPhase()
   const sessionId = useSessionStore((s) => s.sessionId)
   const state = useSessionStore((s) => s.state)
   const currentIndex = PHASE_ORDER.indexOf(phase)
@@ -176,10 +211,12 @@ function InitPhaseContent() {
   const setFieldOverride = useSessionStore((s) => s.setFieldOverride)
   const values = { ...(state?.interview_data_values ?? {}), ...pendingOverrides }
 
+  // Fall back to saved defaults from localStorage when state/overrides are empty
+  // (e.g. right after New Session before the init effect seeds overrides)
   const orgList: string[] = Array.isArray(values.organization_hierarchy)
     ? values.organization_hierarchy.map(String)
-    : []
-  const missionText = typeof values.mission_text === "string" ? values.mission_text : ""
+    : getDefaultOrgList()
+  const missionText = typeof values.mission_text === "string" ? values.mission_text : getMissionText()
 
   const [editingOrg, setEditingOrg] = useState(false)
   const [editingMission, setEditingMission] = useState(false)

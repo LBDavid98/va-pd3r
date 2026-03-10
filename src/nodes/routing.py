@@ -231,11 +231,11 @@ def _route_drafting_phase(intent: str, state: AgentState) -> RouteDestination:
         return "answer_question"
 
     if intent == "modify_answer":
-        return "handle_draft_response"
+        return "handle_element_revision"
 
-    # Unsolicited info treated as implicit feedback on current element
+    # Unsolicited info treated as revision request on a specific element
     if intent == "provide_information":
-        return "handle_draft_response"
+        return "handle_element_revision"
 
     # Default - stay on user input for clarification
     return "user_input"

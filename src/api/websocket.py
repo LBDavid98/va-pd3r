@@ -43,11 +43,33 @@ async def websocket_chat(websocket: WebSocket, session_id: str, manager: Session
     async def process_message(content: str, field_overrides: dict | None):
         """Run send_message and relay results back over the WebSocket."""
         try:
+            # Stream AI messages and state updates in real-time as nodes complete
+            async def stream_message(msg_content: str):
+                await websocket.send_json({
+                    "type": "agent_message",
+                    "data": {"content": msg_content},
+                })
+
+            async def stream_state(state_data: dict):
+                await websocket.send_json({
+                    "type": "state_update",
+                    "data": state_data,
+                })
+
+            async def stream_element(element_data: dict):
+                await websocket.send_json({
+                    "type": "element_update",
+                    "data": element_data,
+                })
+
             result = await manager.send_message(
                 session_id, content, field_overrides=field_overrides,
+                on_message=stream_message,
+                on_state=stream_state,
+                on_element_update=stream_element,
             )
 
-            # Send agent messages
+            # Send any remaining messages not already streamed
             for msg_content in result.get("messages", []):
                 await websocket.send_json({
                     "type": "agent_message",
@@ -68,7 +90,7 @@ async def websocket_chat(websocket: WebSocket, session_id: str, manager: Session
                     "data": prompt_data,
                 })
 
-            # Send state update
+            # Send final state update
             state = result.get("state", {})
             await websocket.send_json({
                 "type": "state_update",

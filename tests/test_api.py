@@ -7,12 +7,14 @@ import pytest
 from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 
-from src.api.app import app, session_manager
+import sys
+from src.api.app import app
 
 
 @pytest.fixture
 def client():
-    return TestClient(app)
+    with TestClient(app) as c:
+        yield c
 
 
 class TestHealthEndpoint:
@@ -63,7 +65,8 @@ class TestExportEndpoint:
 
     def test_export_bad_format(self, client):
         # Register a fake session to test format validation
-        session_manager._sessions["test-session"] = {
+        sm = sys.modules["src.api.app"].session_manager
+        sm._sessions["test-session"] = {
             "thread_id": "test-session",
             "position_title": None,
         }
@@ -72,7 +75,7 @@ class TestExportEndpoint:
             assert resp.status_code == 400
             assert "Format" in resp.json()["detail"]
         finally:
-            session_manager._sessions.pop("test-session", None)
+            sm._sessions.pop("test-session", None)
 
 
 class TestExportTools:

@@ -2,16 +2,26 @@ import { useCallback, useState } from "react"
 import { exportDocument } from "@/api/client"
 import { useSessionStore } from "@/stores/sessionStore"
 
-/** Turn a chat title like "GS-13 2210 IT Specialist [Mar 4]" into a safe filename slug. */
+/**
+ * Turn a chat title like "GS-13 2210 IT Specialist [Mar 4]" into a safe
+ * filename that includes the GS level, series, title, and date of writing.
+ *
+ * Example output: "GS-13_2210_IT_Specialist_20260309.docx"
+ */
 export function buildFilename(title: string | null, ext: string): string {
-  if (!title) return `position_description${ext}`
+  const dateStamp = new Date().toISOString().slice(0, 10).replace(/-/g, "")
+
+  if (!title) return `position_description_${dateStamp}${ext}`
+
   const slug = title
-    .replace(/\[.*?\]/g, "")     // strip date brackets
+    .replace(/\[.*?\]/g, "")     // strip date brackets (replaced by dateStamp)
     .trim()
     .replace(/[^a-zA-Z0-9\-_ ]+/g, "") // remove special chars
     .replace(/\s+/g, "_")        // spaces → underscores
     .replace(/_+$/, "")          // trailing underscores
-  return slug ? `${slug}${ext}` : `position_description${ext}`
+
+  const base = slug || "position_description"
+  return `${base}_${dateStamp}${ext}`
 }
 
 export function useExport() {

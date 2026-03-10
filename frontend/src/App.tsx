@@ -41,8 +41,8 @@ export default function App() {
       try {
         await syncConfigToBackend()
 
-        // Try restoring an existing session from sessionStorage
-        const savedId = sessionStorage.getItem("pd3r-session-id")
+        // Try restoring an existing session from localStorage
+        const savedId = localStorage.getItem("pd3r-session-id")
         if (savedId) {
           const resumed = await useSessionStore.getState().resumeSession(savedId)
           if (resumed) return
@@ -56,7 +56,7 @@ export default function App() {
         if (!res.ok) throw new Error(`API ${res.status}`)
         const data = await res.json()
 
-        sessionStorage.setItem("pd3r-session-id", data.session_id)
+        localStorage.setItem("pd3r-session-id", data.session_id)
         useSessionStore.setState({
           sessionId: data.session_id,
           phase: data.phase,

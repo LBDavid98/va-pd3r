@@ -2,10 +2,13 @@
 
 Provides REST endpoints for session management, messaging, and document export.
 WebSocket endpoint for streaming chat is in websocket.py.
+
+Sessions persist across server restarts via SQLite checkpointing.
 """
 
 import logging
 import os
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,10 +35,26 @@ logger = logging.getLogger(__name__)
 
 settings = get_settings()
 
+# Module-level reference populated during lifespan
+session_manager: SessionManager | None = None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize and tear down the session manager with SQLite persistence."""
+    global session_manager
+    session_manager = await SessionManager.create()
+    logger.info("Session manager initialised (SQLite-backed)")
+    yield
+    await session_manager.close()
+    logger.info("Session manager shut down")
+
+
 app = FastAPI(
     title="PD3r API",
     description="Federal Position Description writing agent API",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -45,8 +64,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-session_manager = SessionManager()
 
 
 # --- Session endpoints ---
@@ -105,7 +122,7 @@ async def get_session(session_id: str):
 @app.delete("/sessions/{session_id}")
 async def delete_session(session_id: str):
     """Delete a session."""
-    if not session_manager.delete_session(session_id):
+    if not await session_manager.delete_session(session_id):
         raise HTTPException(status_code=404, detail="Session not found")
     return {"status": "deleted"}
 

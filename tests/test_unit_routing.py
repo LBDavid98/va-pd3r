@@ -275,19 +275,18 @@ class TestDraftingPhaseRouting:
 
         assert result == "answer_question"
 
-    def test_modify_goes_to_handle_draft_response(self):
-        """Modify in drafting phase routes to handle_draft_response."""
+    def test_modify_goes_to_handle_element_revision(self):
+        """Modify in drafting phase routes to handle_element_revision for LLM-based element identification."""
         state = {"last_intent": "modify_answer", "phase": "drafting", "draft_elements": []}
 
         result = route_by_intent(state)
 
-        assert result == "handle_draft_response"
+        assert result == "handle_element_revision"
 
-    def test_provide_info_goes_to_handle_draft_response(self):
-        """Unsolicited info in drafting phase routes to handle_draft_response.
+    def test_provide_info_goes_to_handle_element_revision(self):
+        """Unsolicited info in drafting phase routes to handle_element_revision.
 
-        This prevents an infinite loop where provide_information falls through
-        to user_input, which re-classifies the same input.
+        This uses LLM to identify the target element rather than relying on stale current_element_index.
         """
         state = {
             "last_intent": "provide_information",
@@ -297,7 +296,7 @@ class TestDraftingPhaseRouting:
 
         result = route_by_intent(state)
 
-        assert result == "handle_draft_response"
+        assert result == "handle_element_revision"
 
     def test_unrecognized_goes_to_user_input(self):
         """Unrecognized intent in drafting stays on user_input."""

@@ -137,6 +137,7 @@ export interface WSElementUpdate {
   name: string
   status: ElementStatus
   content?: string
+  qa_review?: Record<string, unknown>
 }
 
 // --- Chat UI ---

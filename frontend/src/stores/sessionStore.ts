@@ -68,7 +68,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     set({ isLoading: true, error: null })
     try {
       const res = await api.createSession()
-      sessionStorage.setItem(SESSION_KEY, res.session_id)
+      localStorage.setItem(SESSION_KEY, res.session_id)
       set({
         sessionId: res.session_id,
         phase: res.phase as Phase,
@@ -144,7 +144,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   resumeSession: async (id: string) => {
     try {
       const state = await api.getSession(id)
-      sessionStorage.setItem(SESSION_KEY, id)
+      localStorage.setItem(SESSION_KEY, id)
       set({
         sessionId: id,
         phase: state.phase,
@@ -177,7 +177,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
 
       return true
     } catch {
-      sessionStorage.removeItem(SESSION_KEY)
+      localStorage.removeItem(SESSION_KEY)
       toast.error("Session no longer available on server")
       return false
     }
@@ -220,7 +220,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
 
   reset: async () => {
     const { sessionId } = get()
-    sessionStorage.removeItem(SESSION_KEY)
+    localStorage.removeItem(SESSION_KEY)
     if (sessionId) {
       try {
         await api.deleteSession(sessionId)

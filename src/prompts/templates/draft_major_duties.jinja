@@ -5,7 +5,7 @@ You are drafting the **Major Duties and Responsibilities** section of a federal 
 
 **Position Title**: {{ position_title }}
 **Series**: {{ series }}
-**Grade**: GS-{{ grade }}
+**Target Grade**: GS-{{ grade }} (for internal calibration only — do NOT state the grade level in the output)
 {% if is_supervisor %}
 **Supervisory Position**: Yes (supervises {{ num_supervised }} employees, {{ percent_supervising }}% of time)
 {% endif %}
@@ -27,7 +27,7 @@ From the interview, the following duties were identified:
 {% if duty_template %}
 ## Series-Specific Duty Sections (REQUIRED)
 
-This is a GS-{{ series }}-{{ grade }} position. The following duty sections MUST be included with weights in the specified ranges:
+The following duty sections MUST be included with weights in the specified ranges:
 
 {% for section in duty_template.duty_sections %}
 ### {{ section.title }} ({{ section.percent_range[0] }}-{{ section.percent_range[1] }}%)
@@ -75,5 +75,7 @@ Example tasks:
 ```
 
 ---
+
+**CRITICAL**: Do NOT explicitly state the grade level (e.g., "at the GS-11 level") anywhere in the output. The grade is determined by the classifier — the PD describes the work without referencing a specific grade.
 
 Generate the Major Duties section now. Include percentage weights that sum to 100%. Output the formatted duties text only, no explanations.

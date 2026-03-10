@@ -98,19 +98,19 @@ graph TD
     classDef qa fill:#fff8e1,stroke:#FFC107,stroke-width:2px,color:#F57F17
     classDef routing fill:#fce4ec,stroke:#E91E63,stroke-width:1px,color:#880E4F,stroke-dasharray:3
 
-    class __end__ startEnd
     class end_conversation startEnd
-    class handle_draft_response drafting
-    class check_interview_complete interview
     class user_input interview
-    class init init
-    class map_answers interview
     class qa_review qa
-    class gather_requirements drafting
-    class classify_intent routing
+    class check_interview_complete interview
     class __start__ startEnd
-    class evaluate_fes drafting
-    class answer_question interview
+    class map_answers interview
     class prepare_next interview
+    class __end__ startEnd
     class advance_element routing
+    class evaluate_fes drafting
+    class handle_draft_response drafting
+    class init init
+    class gather_requirements drafting
+    class answer_question interview
     class generate_element drafting
+    class classify_intent routing

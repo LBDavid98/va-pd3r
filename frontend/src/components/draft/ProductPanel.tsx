@@ -369,7 +369,7 @@ function DraftSection({
       {expanded && hasContent && !editing && (
         <div className="mb-3 rounded-md border border-border bg-muted/30 text-sm overflow-hidden">
           {/* QA Report */}
-          {qaReview && (
+          {qaReview && qaReview.passes !== undefined && (
             <div className="px-3 py-2">
               <div className="flex items-center gap-2 mb-1.5">
                 {qaReview.passes
@@ -379,15 +379,15 @@ function DraftSection({
                   QA {qaReview.passes ? "Passed" : "Failed"}
                 </span>
                 <span className="text-[10px] text-muted-foreground ml-auto tabular-nums">
-                  {qaReview.passed_count}/{qaReview.passed_count + qaReview.failed_count} checks
+                  {qaReview.passed_count ?? 0}/{(qaReview.passed_count ?? 0) + (qaReview.failed_count ?? 0)} checks
                 </span>
               </div>
               {qaReview.overall_feedback && (
                 <p className="text-[11px] text-muted-foreground mb-1.5 leading-snug">{qaReview.overall_feedback}</p>
               )}
-              {qaReview.checks.length > 0 && (
+              {(qaReview.checks ?? []).length > 0 && (
                 <div className="space-y-0.5">
-                  {qaReview.checks.map((c, i) => (
+                  {(qaReview.checks ?? []).map((c, i) => (
                     <QACheckRow key={i} check={c} />
                   ))}
                 </div>

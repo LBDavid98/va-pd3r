@@ -203,9 +203,11 @@ export function useWebSocket(sessionId: string | null) {
             break
           }
           case "state_update": {
+            const prevPhase = useSessionStore.getState().phase
             updateState(msg.data as Record<string, unknown> as Parameters<typeof updateState>[0])
             const phase = msg.data.phase as Phase | undefined
-            if (phase === "drafting") {
+            // Only show "Drafting all sections" on first transition into drafting
+            if (phase === "drafting" && prevPhase !== "drafting") {
               addMessage("agent", "Drafting all sections now — this may take a minute.", "system")
             }
             if (phase === "drafting" || phase === "review" || phase === "complete") {
@@ -218,6 +220,7 @@ export function useWebSocket(sessionId: string | null) {
             updateElement(data.name, {
               status: data.status,
               content: data.content ?? undefined,
+              ...(data.qa_review ? { qa_review: data.qa_review } : {}),
             })
             break
           }
