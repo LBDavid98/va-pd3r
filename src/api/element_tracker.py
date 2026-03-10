@@ -7,7 +7,7 @@ change notifications only when status or content actually changes.
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from src.api.transforms import qa_review_to_summary

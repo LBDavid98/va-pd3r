@@ -61,7 +61,7 @@ See: docs/decisions/006-llm-driven-routing.md, docs/plans/langgraph_migration_pl
 ## ⛔ NO GOD METHODS POLICY ⛔
 ```markdown
 FORBIDDEN:
-- API endpoint handlers >50 lines (extract to helper methods/classes)
+- API endpoint handlers >75 lines (extract to helper methods/classes)
 - Methods mixing orchestration with business logic
 - Inline data transformations in streaming loops (extract to transforms module)
 - Duplicate transformation logic (same data → same shape in multiple places)

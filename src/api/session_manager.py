@@ -15,7 +15,6 @@ from pathlib import Path
 from typing import Any
 
 import aiosqlite
-from langchain_core.messages import AIMessage
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from langgraph.types import Command
 

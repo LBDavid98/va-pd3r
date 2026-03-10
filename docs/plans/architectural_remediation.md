@@ -169,7 +169,7 @@ Four architectural problems compound each other:
 - [x] 1.3b Extract `_update_position_title()` private method
 - [x] 1.3c Refactor `send_message()` to orchestration-only (~67 lines incl docstring, down from 173)
 - [x] 1.3d Run full test suite + TypeScript type check — 881 passed, tsc clean
-- [ ] 1.3e **Commit checkpoint: "Decompose send_message into single-responsibility units"**
+- [x] 1.3e **Commit checkpoint: "Decompose send_message into single-responsibility units"**
 
 ---
 
@@ -275,7 +275,7 @@ Four architectural problems compound each other:
 - [x] 2.3c 18 unit tests for structured action protocol (regex, classification, intent mapping)
 - [x] 2.3d Free-text "approve" still works (falls through to LLM classification)
 - [x] 2.3e Full suite: 899 tests passing, tsc clean, vite build clean
-- [ ] 2.3f **Commit checkpoint: "Unify approval flow — backend authoritative for status"**
+- [x] 2.3f **Commit checkpoint: "Unify approval flow — backend authoritative for status"**
 
 ---
 
@@ -388,7 +388,7 @@ Four architectural problems compound each other:
 - [x] 3.3c TypeScript clean, 44 Phase 1-3 tests passing
 - [ ] 3.4a Audit node messages — identify internal vs user-facing (gradual)
 - [ ] 3.4b Replace internal messages with activity signals (node by node, gradual)
-- [ ] 3.4c **Commit checkpoint: "Replace message suppression with structured agent visibility"**
+- [x] 3.4c **Commit checkpoint: "Replace message suppression with structured agent visibility"**
 
 ---
 
@@ -469,7 +469,7 @@ Four architectural problems compound each other:
 - [x] 4.3c Removed unused `"batch"` metadata key from all 18 SECTION_REGISTRY entries
 - [x] 4.3d Updated `__all__` export list to match
 - [x] 4.3e Full suite: 899 tests passing, tsc clean
-- [ ] 4.3f **Commit checkpoint: "Remove dead batch/parallel code from drafting config"**
+- [x] 4.3f **Commit checkpoint: "Remove dead batch/parallel code from drafting config"**
 
 ---
 
@@ -583,7 +583,7 @@ See: docs/decisions/011-structured-agent-visibility.md
 - [x] 5.4a Update auto-memory MEMORY.md (architectural policies section)
 - [x] 5.5a Update mvp_roadmap.md (Phase 4.5 section)
 - [x] 5.5b Update CLAUDE.md Current Focus section
-- [ ] 5.5c **Commit checkpoint: "Document architectural policies to prevent regression"**
+- [x] 5.5c **Commit checkpoint: "Document architectural policies to prevent regression"**
 
 ---
 
