@@ -312,7 +312,7 @@ async def qa_review_node(state: AgentState) -> dict:
                 overall_conf = 0.0
 
         element.apply_qa_review(qa_review)
-        if not qa_review.passes and element.can_rewrite:
+        if not qa_review.passes:
             element.save_to_history(reason="qa_failure")
 
         return idx, element, qa_review, overall_conf
@@ -332,37 +332,53 @@ async def qa_review_node(state: AgentState) -> dict:
 
     # Build consolidated messages
     messages: list[AIMessage] = []
+    # Prefer the element the user was actively working on (current_element_name),
+    # falling back to the first ready index.  This prevents a targeted revision
+    # (e.g., Factor 9) from being overshadowed by a lower-index element.
+    current_element_name = state.get("current_element_name", "")
     primary_index = ready_indices[0]
+    if current_element_name:
+        for idx in ready_indices:
+            if draft_elements[idx].get("name") == current_element_name:
+                primary_index = idx
+                break
+    # Only the primary element gets a full chat message.  Other elements
+    # are visible via element_update in the ProductPanel — flooding the
+    # chat with "X ✅ Passed QA" × 9 is noise when a status tracker exists.
     next_prompt = ""
+    other_passed = 0
+    other_needs_rewrite = 0
 
     for idx, element, qa_review, conf in results:
-        status_emoji = "✓" if qa_review.passes else "✗"
-        passed_count = qa_review.passed_count
-        total_count = len(qa_review.check_results)
-
-        # Concise chat message — full content is visible in the draft panel
-        if qa_review.passes:
-            msg = f"**{element.display_name}** ✅ Passed QA Review\n\nReview the section in the draft panel and approve or request changes."
-            if idx == primary_index:
-                next_prompt = "Do you approve this section?"
-        elif element.can_rewrite:
-            msg = f"**{element.display_name}** needs revision — rewriting automatically (attempt {element.revision_count + 1})..."
+        if idx == primary_index:
+            # Primary element always gets a chat message
+            if qa_review.passes:
+                msg = f"**{element.display_name}** passed QA — ready for your review."
+            elif element.can_rewrite:
+                msg = f"**{element.display_name}** needs revision — rewriting automatically (attempt {element.revision_count + 1})..."
+            else:
+                msg = f"**{element.display_name}** didn't fully pass QA — please review and provide feedback."
+            messages.append(AIMessage(content=msg))
         else:
-            msg = (
-                f"**{element.display_name}** did not fully pass QA (rewrite limit reached).\n\n"
-                "Review in the draft panel and approve or provide feedback."
-            )
-            if idx == primary_index:
-                next_prompt = "Do you approve this section, or provide feedback for changes?"
+            # Count non-primary results for summary
+            if qa_review.passes:
+                other_passed += 1
+            elif element.can_rewrite:
+                other_needs_rewrite += 1
+            else:
+                other_passed += 1  # At limit — still shows in panel
 
-        messages.append(AIMessage(content=msg))
+    # One-line summary for batch results (if any)
+    if other_passed > 0:
+        section_word = "section" if other_passed == 1 else "sections"
+        messages.append(AIMessage(content=f"{other_passed} other {section_word} also passed QA."))
 
     return {
         "messages": messages,
         "draft_elements": draft_elements,
         "current_element_index": primary_index,
         "current_element_name": DraftElement.model_validate(draft_elements[primary_index]).name,
-        "next_prompt": next_prompt,
+        "next_prompt": next_prompt,  # Empty — ProductPanel buttons handle approval
     }
 
 

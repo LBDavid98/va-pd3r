@@ -88,12 +88,13 @@ The following requirements MUST be addressed in this section:
 {% endif %}
 
 {% if is_rewrite %}
-## REWRITE ATTEMPT
-
-This is a rewrite. The previous draft failed QA review.
+## REVISION REQUEST
+{% if qa_feedback %}
 
 **QA Feedback**:
 {{ qa_feedback }}
+{% endif %}
+{% if qa_failures %}
 
 **Failed Requirements**:
 {% for failure in qa_failures %}
@@ -101,6 +102,15 @@ This is a rewrite. The previous draft failed QA review.
 {% endfor %}
 
 Address ALL failed requirements in this revision.
+{% endif %}
+{% if has_user_feedback %}
+
+## User Feedback
+
+> {{ latest_user_feedback }}
+
+Follow the user's feedback precisely. If they request a word count change, that overrides the default target.
+{% endif %}
 {% endif %}
 
 ---

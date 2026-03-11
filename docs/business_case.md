@@ -8,11 +8,11 @@
 
 Writing federal position descriptions (PDs) is slow, inconsistent, and expensive.
 
-- A single PD takes **8–40 hours** of HR specialist time depending on complexity
-- Drafts frequently fail OPM compliance review, requiring rework cycles
+- A single PD takes **8–40 hours** of combined management and HR specialist time depending on complexity and number of resubmissions
+- Drafts frequently fail to score at target level during classification review, requiring rework cycles and arguments.
 - FES factor evaluation requires deep knowledge of 9 factors across 350+ level definitions
 - HR specialists juggle 100+ GS series, each with distinct duty templates
-- Hiring timelines stretch months while PDs sit in drafting queues
+- Hiring timelines stretch months while PDs sit in drafting queues. This leads to overburden of VA staff and increased overtime costs at a facility level. 
 
 ---
 
@@ -24,8 +24,8 @@ PD3r (Pete) is a conversational AI agent that **writes complete, OPM-compliant p
 
 | Phase | What Happens |
 |-------|-------------|
-| **Interview** | Pete asks 30+ structured questions, collecting position details conversationally |
-| **FES Evaluation** | Automatically evaluates 9 FES factors and calculates grade recommendation |
+| **Interview** | Pete asks  structured questions, collecting position details conversationally |
+| **FES Evaluation** | Automatically evaluates 9 FES factors and calculates grade recommendation. Evaluates supervisory factors as well as a part of the interview. |
 | **Drafting** | Generates 8 PD elements using series-specific templates and collected data |
 | **QA Review** | Each element checked against requirements; auto-rewrites on failure |
 | **Export** | Produces formatted Word (.docx) or Markdown documents |
@@ -35,9 +35,8 @@ PD3r (Pete) is a conversational AI agent that **writes complete, OPM-compliant p
 - **Real-time chat interface** with streaming responses via WebSocket
 - **OPM compliance built in** — FES factors, DOES statements, series templates for 100+ GS series
 - **Automated quality assurance** — every draft element validated against requirements
-- **Session persistence** — resume interrupted PDs, write additional PDs without restarting
-- **Field overrides** — HR specialists can correct any collected data inline
-- **RAG knowledge base** — answers HR policy questions during the interview
+- **Field overrides** — Users can correct any collected data inline
+- **RAG knowledge base** — answers HR policy questions during the interview using vector stored HR policy documents. Answers come with page and document level citation.
 - **Export to Word/Markdown** — production-ready documents
 
 ---
@@ -74,7 +73,7 @@ Federal software development contracts for AI/ML applications typically run:
 ### Why Contractors Charge This Much
 
 - **AI/ML premium**: LLM integration is billed at $250–$350/hr "AI specialist" rates
-- **Federal compliance**: ATO, 508 accessibility, FedRAMP add 20–40% to any project
+- **Federal compliance**: ATO,  FedRAMP add a large overhaed to any project contracted
 - **Domain complexity**: OPM rules, FES factors, series templates require paid SME time
 - **Overhead**: Clearances, COR reporting, subcontractor markup, travel, facilities
 
@@ -85,9 +84,9 @@ Federal software development contracts for AI/ML applications typically run:
 | Resource | Detail |
 |----------|--------|
 | **Team** | 1 developer |
-| **Timeline** | Weeks, not months |
-| **External cost** | OpenAI API usage only (~$0.50–$1.00 per PD generated) |
-| **Infrastructure** | Docker containers on existing VA infrastructure |
+| **Timeline** | 4 months |
+| **External cost** | OpenAI API usage only (~$0.50–$1.00 per PD generated) before fine tuning |
+| **Infrastructure** | Can be served in Docker containers on existing VA infrastructure |
 
 ---
 
@@ -95,16 +94,16 @@ Federal software development contracts for AI/ML applications typically run:
 
 ### Cost Avoidance
 
-Building internally at a fraction of contract cost represents **$1M–$3M in cost avoidance** compared to procurement.
+Building internally at a fraction of contract cost represents **$1M–$3M in cost avoidance** compared to procurement. That's before you consider procurement timelines. 
 
 ### Speed to Delivery
 
 | Metric | Contract | Internal |
 |--------|----------|----------|
-| Time to first working prototype | 4–6 months | 2 weeks |
-| Time to production-ready | 12–18 months | 2 months |
-| Iteration cycle | Weeks (change orders) | Hours |
-| Feature request turnaround | Contract modification | Same sprint |
+| Time to first working prototype | 4–6 months | 2 months |
+| Time to production-ready | 12–18 months | 4-6 months |
+| Iteration cycle | Weeks (change orders) | Days |
+| Feature request turnaround | Contract modification | Next sprint |
 
 ### Operational Advantages
 
@@ -119,6 +118,7 @@ Building internally at a fraction of contract cost represents **$1M–$3M in cos
 - **No contract modifications** — scope changes are commits, not change orders
 - **Transparent AI** — we control the prompts, can audit every decision, trace every output
 - **Data stays internal** — only anonymized position data reaches the LLM API
+- **Agentic Coding** - Reduces the burden for both feature development and codebase maintenance with a proper SOP. 
 
 ---
 
@@ -279,7 +279,7 @@ PD authoring is a collaboration between **management** (who drafts the position 
 |------|-----------|
 | LLM hallucination | QA review node validates every element; human review before finalization |
 | API dependency (OpenAI) | Architecture supports model swapping (Anthropic, Azure OpenAI, local models) |
-| ATO requirements | Containerized, auditable, no PII stored in LLM calls |
+| ATO requirements | Containerized, auditable |
 | Adoption resistance | Conversational UX designed for non-technical HR users |
 | Single developer | Comprehensive test suite + documentation enable knowledge transfer |
 
@@ -287,7 +287,7 @@ PD authoring is a collaboration between **management** (who drafts the position 
 
 ## Recommendation
 
-Invest in scaling PD3r internally rather than contracting out.
+Invest in scaling PD3r internally rather than contracting out. Consider additional agentic workflows for common administrative tasks like drafting contracting documents, common report formatting, less common but critical reports where an interview can improve quality of information received (Joint Patient Safety Reporting for example). 
 
 1. **Continue development** — add remaining features (approval workflows, org templates)
 2. **Pilot with 2–3 HR teams** — validate time savings with real users
@@ -309,7 +309,7 @@ Invest in scaling PD3r internally rather than contracting out.
 | **ROI on operating cost** | — | 96:1 |
 | **Timeline** | 12–24 months | Already built |
 | **Ownership** | Vendor-dependent | VA-owned |
-| **Iteration speed** | Change orders | Same day |
+| **Iteration speed** | Change orders | Next Sprint |
 | **Domain knowledge** | Leaves with contractor | Captured in code |
 
 **PD3r demonstrates that internal AI capability can deliver enterprise-grade tools at a fraction of the cost and timeline of traditional federal IT procurement. At scale, it recovers 94,500 hours annually — the equivalent of 38 managers and 8 HR specialists — freeing them from PD drafting work while netting $6.4M in annual savings against a $67K steady-state operating cost.**

@@ -288,6 +288,9 @@ class DraftElement(BaseModel):
             self.revision_count += 1
             # Clear rewrite reason after successful update
             self.rewrite_reason = None
+        # Clear user feedback after generation so it doesn't leak into
+        # future auto-rewrite cycles (stale feedback prevention).
+        self.feedback = ""
 
     def apply_qa_review(self, review: QAReview) -> None:
         """Apply QA review results and save to history."""
@@ -379,7 +382,7 @@ DRAFT_ELEMENT_DISPLAY_NAMES: dict[str, str] = {
 DRAFT_ELEMENT_PREREQUISITES: dict[str, list[str]] = {
     "introduction": [],
     "background": ["introduction"],
-    "major_duties": ["introduction"],
+    "major_duties": ["introduction", "background"],
     "factor_1_knowledge": ["introduction", "major_duties"],
     "factor_2_supervisory_controls": ["introduction", "major_duties"],
     "factor_3_guidelines": ["introduction", "major_duties"],

@@ -7,8 +7,8 @@
  *     feedback, inline editing, lock/unlock, and approve controls
  *   - ExportBar: accept-all + download buttons
  *
- * Word count targets mirror backend `drafting_sections.py` and can be overridden
- * per-section via click-to-edit (persisted in localStorage).
+ * Word count targets are fetched from backend (`GET /config/word-counts`) and can
+ * be overridden per-section via click-to-edit (synced to backend session + localStorage).
  *
  * Status dots use a spinner for `needs_revision` during active drafting (when
  * the agent is still processing) to avoid confusing transient QA failures.
@@ -36,42 +36,37 @@ import {
 } from "@/components/ui/tooltip"
 import { ExportBar } from "./ExportBar"
 import { cn } from "@/lib/utils"
+import { getWordCountDefaults, patchWordCounts } from "@/api/client"
 import type { DraftElementSummary, QACheckSummary, ElementAction, AgentActivity } from "@/types/api"
-
-// Default target word counts — mirrors backend TARGET_WORD_COUNTS in drafting_sections.py
-const DEFAULT_TARGET_WORD_COUNTS: Record<string, number> = {
-  introduction: 240,
-  background: 400,
-  duties_overview: 300,
-  major_duties: 300,
-  factor_1_knowledge: 270,
-  factor_2_supervisory_controls: 270,
-  factor_3_guidelines: 260,
-  factor_4_complexity: 250,
-  factor_5_scope_effect: 260,
-  factor_6_7_contacts: 260,
-  factor_8_physical_demands: 80,
-  factor_9_work_environment: 60,
-  other_significant_factors: 260,
-  supervisory_factor_1_program_scope: 260,
-  supervisory_factor_2_organizational_setting: 260,
-  supervisory_factor_3_authority: 260,
-  supervisory_factor_4_contacts: 260,
-  supervisory_factor_5_work_directed: 260,
-  supervisory_factor_6_other_conditions: 260,
-}
 
 const LS_WORD_COUNT_OVERRIDES = "pd3r_word_count_targets"
 
+/**
+ * Backend-fetched defaults — loaded once on first access.
+ * Single source of truth: backend's TARGET_WORD_COUNTS in drafting_sections.py.
+ */
+let _cachedDefaults: Record<string, number> | null = null
+
+async function loadWordCountDefaults(): Promise<Record<string, number>> {
+  if (_cachedDefaults) return _cachedDefaults
+  try {
+    _cachedDefaults = await getWordCountDefaults()
+  } catch {
+    // Fallback: empty defaults (targets will show as 0 until backend responds)
+    _cachedDefaults = {}
+  }
+  return _cachedDefaults
+}
+
 function getWordCountTargets(): Record<string, number> {
+  const defaults = _cachedDefaults ?? {}
   try {
     const raw = localStorage.getItem(LS_WORD_COUNT_OVERRIDES)
     if (raw) {
-      const parsed = JSON.parse(raw)
-      return { ...DEFAULT_TARGET_WORD_COUNTS, ...parsed }
+      return { ...defaults, ...JSON.parse(raw) }
     }
   } catch { /* ignore */ }
-  return { ...DEFAULT_TARGET_WORD_COUNTS }
+  return { ...defaults }
 }
 
 function saveWordCountTarget(sectionName: string, target: number) {
@@ -128,7 +123,23 @@ export function ProductPanel() {
     ? [...CORE_SECTIONS, ...SUPERVISORY_SECTIONS]
     : CORE_SECTIONS
 
-  const wordCountTargets = useMemo(() => getWordCountTargets(), [])
+  const [wordCountTargets, setWordCountTargets] = useState<Record<string, number>>(() => getWordCountTargets())
+
+  // Fetch defaults from backend on mount (single source of truth)
+  useEffect(() => {
+    loadWordCountDefaults().then(() => setWordCountTargets(getWordCountTargets()))
+  }, [])
+
+  // Callback for DraftSection to update targets (localStorage + backend session)
+  const onTargetChange = useCallback((sectionName: string, target: number) => {
+    saveWordCountTarget(sectionName, target)
+    setWordCountTargets(getWordCountTargets())
+    // Sync to backend session so prompts use the updated target
+    const sid = state?.session_id
+    if (sid) {
+      patchWordCounts(sid, { [sectionName]: target }).catch(() => {/* best-effort */})
+    }
+  }, [state?.session_id])
 
   return (
     <div className="flex h-full flex-col">
@@ -150,6 +161,7 @@ export function ProductPanel() {
                 displayName={sec.display}
                 element={el}
                 targetWordCount={wordCountTargets[sec.name] ?? 0}
+                onTargetChange={onTargetChange}
                 activity={sectionActivity}
               />
             )
@@ -175,12 +187,14 @@ function DraftSection({
   displayName,
   element,
   targetWordCount,
+  onTargetChange,
   activity,
 }: {
   sectionName: string
   displayName: string
   element: DraftElementSummary | undefined
   targetWordCount: number
+  onTargetChange: (sectionName: string, target: number) => void
   activity: AgentActivity | null
 }) {
   const [expanded, setExpanded] = useState(false)
@@ -276,10 +290,10 @@ function DraftSection({
     const num = parseInt(targetDraft, 10)
     if (!isNaN(num) && num > 0) {
       setCurrentTarget(num)
-      saveWordCountTarget(sectionName, num)
+      onTargetChange(sectionName, num)
     }
     setEditingTarget(false)
-  }, [targetDraft, sectionName])
+  }, [targetDraft, sectionName, onTargetChange])
 
   // Word count color
   const wordCountColor = (() => {

@@ -87,23 +87,23 @@ async def websocket_chat(websocket: WebSocket, session_id: str, manager: Session
                     "data": {"content": msg_content},
                 })
 
-            # Send interrupt/prompt if present (skip empty prompts)
+            # Send interrupt/prompt if present
             interrupt = result.get("interrupt")
             if interrupt:
                 prompt_content = interrupt if isinstance(interrupt, str) else interrupt.get("prompt", interrupt.get("message", ""))
-                if not prompt_content:
-                    logger.warning("Empty interrupt prompt for session %s, skipping", session_id)
-                    interrupt = None
-            if interrupt:
-                prompt_data = {"content": prompt_content, "prompt": prompt_content}
-                if isinstance(interrupt, dict):
-                    prompt_data["phase"] = interrupt.get("phase")
-                    prompt_data["current_field"] = interrupt.get("current_field")
-                    prompt_data["missing_fields"] = interrupt.get("missing_fields")
-                await websocket.send_json({
-                    "type": "agent_message",
-                    "data": prompt_data,
-                })
+                if prompt_content:
+                    # Only send prompt as a chat message when it has real content
+                    # (e.g., interview questions).  During drafting/review, prompts
+                    # are empty because the ProductPanel buttons handle user actions.
+                    prompt_data = {"content": prompt_content, "prompt": prompt_content}
+                    if isinstance(interrupt, dict):
+                        prompt_data["phase"] = interrupt.get("phase")
+                        prompt_data["current_field"] = interrupt.get("current_field")
+                        prompt_data["missing_fields"] = interrupt.get("missing_fields")
+                    await websocket.send_json({
+                        "type": "agent_message",
+                        "data": prompt_data,
+                    })
 
             # Send final state update
             state = result.get("state", {})

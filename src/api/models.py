@@ -118,6 +118,11 @@ class PatchFieldsRequest(BaseModel):
     field_overrides: dict[str, Any] = Field(..., min_length=1)
 
 
+class PatchWordCountsRequest(BaseModel):
+    """Per-section word count target overrides."""
+    targets: dict[str, int] = Field(..., min_length=1)
+
+
 class LockElementRequest(BaseModel):
     locked: bool
 

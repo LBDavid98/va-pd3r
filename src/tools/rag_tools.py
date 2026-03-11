@@ -1,7 +1,7 @@
 """RAG (Retrieval-Augmented Generation) tools for HR knowledge queries."""
 
-import os
-from typing import Any, Optional
+import re
+from typing import Any
 
 from langchain_core.documents import Document
 
@@ -10,6 +10,35 @@ from src.tools.vector_store import (
     query_with_scores,
     vector_store_exists,
 )
+
+# Federal HR abbreviations → full terms for better vector search recall.
+# Order matters: longer patterns first to avoid partial replacements.
+_ABBREVIATIONS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"\bPDs\b", re.IGNORECASE), "position descriptions"),
+    (re.compile(r"\bPD\b", re.IGNORECASE), "position description"),
+    (re.compile(r"\bFES\b", re.IGNORECASE), "Factor Evaluation System"),
+    (re.compile(r"\bGSSG\b", re.IGNORECASE), "General Schedule Supervisory Guide"),
+    (re.compile(r"\bOPM\b", re.IGNORECASE), "Office of Personnel Management"),
+    (re.compile(r"\bGS\b"), "General Schedule"),  # case-sensitive to avoid false matches
+    (re.compile(r"\bSME\b", re.IGNORECASE), "subject matter expert"),
+    (re.compile(r"\bKSA\b", re.IGNORECASE), "knowledge skills and abilities"),
+    (re.compile(r"\bHR\b", re.IGNORECASE), "human resources"),
+]
+
+
+def expand_abbreviations(query: str) -> str:
+    """Expand common federal HR abbreviations for better vector search recall.
+
+    Appends expansions rather than replacing, so both the abbreviation and
+    the full term contribute to the embedding similarity.
+    """
+    expansions: list[str] = []
+    for pattern, full_term in _ABBREVIATIONS:
+        if pattern.search(query):
+            expansions.append(full_term)
+    if expansions:
+        return f"{query} ({', '.join(expansions)})"
+    return query
 
 
 def rag_lookup(
@@ -35,7 +64,8 @@ def rag_lookup(
         print("Warning: Vector store not found. Run ingestion script first.")
         return []
 
-    results = query_with_scores(query, k=k)
+    expanded = expand_abbreviations(query)
+    results = query_with_scores(expanded, k=k)
 
     # Filter by threshold if specified
     # Note: ChromaDB returns L2 distance where lower is better

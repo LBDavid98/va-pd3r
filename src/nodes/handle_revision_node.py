@@ -65,23 +65,16 @@ def handle_draft_response_node(state: AgentState) -> dict:
         if ready_indices:
             ready_index = ready_indices[0]
             next_element = DraftElement.model_validate(draft_elements[ready_index])
-            already_reviewed = next_element.status == "qa_passed"
-            action_msg = (
-                f"Review: {next_element.display_name}"
-                if already_reviewed
-                else ""
-            )
             return {
                 "messages": [
                     AIMessage(
-                        content=f"{success_phrase} **{element.display_name}** approved!\n\n"
-                        f"Moving to next section: {next_element.display_name}"
+                        content=f"{success_phrase} **{element.display_name}** approved!"
                     )
                 ],
                 "draft_elements": draft_elements,
                 "current_element_index": ready_index,
                 "current_element_name": next_element.name,
-                "next_prompt": action_msg,
+                "next_prompt": "",
             }
         # All elements complete
         return {
@@ -190,13 +183,12 @@ def advance_to_next_element_node(state: AgentState) -> dict:
 
     next_element = DraftElement.model_validate(draft_elements[ready_index])
 
+    # No chat message — the ProductPanel and status tracker already show
+    # which element is active.  Emitting "Moving to: X" was operational
+    # noise that duplicated what the UI displays.
     return {
         "current_element_index": ready_index,
         "current_element_name": next_element.name,
-        "messages": [
-            AIMessage(
-                content=f"Moving to: {next_element.display_name}"
-            )
-        ],
+        "messages": [],
         "next_prompt": "",
     }

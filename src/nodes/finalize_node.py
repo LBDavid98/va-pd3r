@@ -277,7 +277,9 @@ async def handle_element_revision_request(state: AgentState) -> dict:
             "next_prompt": "Which section would you like to revise?",
         }
 
-    # Mark element for revision with feedback
+    # Save current draft to history before revision so the rewrite prompt
+    # references the correct "previous draft" the user actually reviewed.
+    element.save_to_history(reason="user_revision")
     element.request_revision(feedback)
     draft_elements[idx] = element.model_dump()
 

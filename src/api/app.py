@@ -22,6 +22,7 @@ from src.api.models import (
     LLMConfigRequest,
     LLMConfigResponse,
     PatchFieldsRequest,
+    PatchWordCountsRequest,
     SeedSessionRequest,
     SendMessageRequest,
     SendMessageResponse,
@@ -29,6 +30,7 @@ from src.api.models import (
 )
 from src.api.session_manager import SessionManager
 from src.api.websocket import websocket_chat
+from src.config.drafting_sections import TARGET_WORD_COUNTS
 from src.config.settings import get_settings
 
 logger = logging.getLogger(__name__)
@@ -185,6 +187,29 @@ async def patch_fields(session_id: str, request: PatchFieldsRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.patch("/sessions/{session_id}/word-counts")
+async def patch_word_counts(session_id: str, request: PatchWordCountsRequest):
+    """Persist per-session word count target overrides to the checkpoint.
+
+    Called by the frontend when the user edits a section's target word count.
+    The overrides are merged into word_count_targets in the LangGraph state
+    so generate_element_node uses the user's preferred targets.
+    """
+    if not session_manager.session_exists(session_id):
+        raise HTTPException(status_code=404, detail="Session not found")
+    try:
+        config = session_manager._config_for(session_id)
+        current_state = await session_manager._graph.aget_state(config)
+        existing = (current_state.values or {}).get("word_count_targets") or {}
+        merged = {**existing, **request.targets}
+        await session_manager._graph.aupdate_state(config, {"word_count_targets": merged})
+        logger.info("Updated word count targets for %s: %s", session_id, list(request.targets.keys()))
+        return {"status": "ok", "targets_updated": list(request.targets.keys())}
+    except Exception as e:
+        logger.exception("Failed to patch word counts")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # --- Message endpoints ---
 
 
@@ -299,6 +324,15 @@ async def get_config():
         has_key=bool(os.environ.get("OPENAI_API_KEY")),
         base_url=os.environ.get("OPENAI_BASE_URL"),
     )
+
+
+@app.get("/config/word-counts")
+async def get_word_count_defaults():
+    """Return default word count targets from the backend config.
+
+    Single source of truth — frontend fetches these instead of hardcoding.
+    """
+    return TARGET_WORD_COUNTS
 
 
 @app.post("/config", response_model=LLMConfigResponse)

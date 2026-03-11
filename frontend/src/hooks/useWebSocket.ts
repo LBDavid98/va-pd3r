@@ -13,21 +13,29 @@ const TYPING_TIMEOUT = 90_000 // Safety: clear typing indicator after 90s of no 
 /**
  * Classify agent messages to reduce chat noise during drafting/review.
  *
- * With structured activity_update messages (Phase 3) and node prompt
- * cleanup (Phase 3.4), this filter only catches edge cases:
- *   1. Draft content leaked into chat (belongs in ProductPanel)
- *   2. Approval prompts (handled by ProductPanel buttons)
+ * The ProductPanel and status tracker show element status, QA results,
+ * and provide approve/reject buttons.  Chat should only contain
+ * conversational messages — not operational status updates.
  */
 function classifyAgentMessage(content: string): { action: "show" | "system" | "suppress"; replacement?: string } {
-  const lower = content.toLowerCase()
-
   // Draft content leaked into chat (long content with markdown delimiters)
   if (content.includes("\n---\n") && content.length > 500) {
     return { action: "suppress" }
   }
 
-  // Approval prompts — handled by ProductPanel buttons, not chat
-  if (lower.includes("do you approve")) {
+  // Operational messages that duplicate what the panel/tracker already shows
+  if (content.startsWith("Moving to:") || content.startsWith("Moving to ")) {
+    return { action: "suppress" }
+  }
+  if (content.includes("(queued for QA)")) {
+    return { action: "suppress" }
+  }
+
+  // Generic prompts redundant with ProductPanel buttons
+  if (content === "Do you approve this section?" || content === "What would you like to do next?") {
+    return { action: "suppress" }
+  }
+  if (content === "Do you approve this section, or provide feedback for changes?") {
     return { action: "suppress" }
   }
 

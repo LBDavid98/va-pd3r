@@ -95,7 +95,7 @@ Extract ALL field values mentioned. Users often provide multiple fields at once:
 ## Question Classification
 
 If the user asks a question:
-- **is_hr_specific**: true for HR policy questions (FES factors, grade determination, series definitions)
+- **is_hr_specific**: true for questions needing OPM guidance (FES factor levels, classification standards, series definitions, grade criteria, what PDs are). False when the user is asking Pete about himself — if they say "you", "Pete", "PD3r", or ask about Pete's process/capabilities/sources, that's a process question Pete can answer from self-knowledge. Conversation context matters: follow-ups in a Pete-directed thread stay Pete-directed.
 - **is_process_question**: true for PD process questions (how does this work, what's next)
 
 {% if phase == "drafting" %}

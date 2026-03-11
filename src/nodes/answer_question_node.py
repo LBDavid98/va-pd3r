@@ -187,6 +187,20 @@ async def answer_question_node(state: AgentState) -> dict:
         intent = IntentClassification.model_validate(intent_dict)
         is_hr_question = intent.is_hr_specific or False
 
+    # Override: questions directed at Pete about himself should use self-knowledge,
+    # not RAG. OPM documents say nothing about PD3r/Pete, so RAG fails on these.
+    question_lower = question.lower()
+    is_pete_directed = any(term in question_lower for term in [
+        "pete", "pd3r", "yourself", "about you",
+        "how do you ", "how does pd3r", "where do you ",
+        "your process", "your sources", "your information",
+        "do you do", "do you work", "do you generate", "do you write",
+        "do you evaluate", "do you use",
+    ])
+    if is_pete_directed:
+        is_hr_question = False
+        logger.info("Pete-directed question detected, using self-knowledge path: %s", question[:80])
+
     try:
         # Use RAG for HR questions if knowledge base exists
         if is_hr_question and vector_store_exists():

@@ -49,6 +49,7 @@ def _build_prompt_context(
     is_rewrite: bool = False,
     qa_feedback: str = "",
     qa_failures: list = None,
+    word_count_overrides: dict | None = None,
 ) -> dict:
     """Build the context dict for the draft.jinja template."""
     section_config = _get_section_config(element.name)
@@ -73,7 +74,7 @@ def _build_prompt_context(
         "is_rewrite": is_rewrite,
         "qa_feedback": qa_feedback,
         "qa_failures": qa_failures or [],
-        "target_word_count": TARGET_WORD_COUNTS.get(element.name, 0),
+        "target_word_count": (word_count_overrides or {}).get(element.name) or TARGET_WORD_COUNTS.get(element.name, 0),
     }
 
     # Add supervisory interview data for GSSG factor sections
@@ -212,11 +213,17 @@ async def generate_element_node(state: AgentState) -> dict:
         idx for idx in ready_indices
         if draft_elements[idx].get("status") in {"pending", "needs_revision"}
     ]
+
+    # When user requested revision of a specific element, only generate THAT element.
+    # Other elements that happen to be needs_revision (from prior QA failures) should
+    # not be regenerated as a side effect — the user didn't ask for them.
+    current_elem = draft_elements[element_index] if element_index < len(draft_elements) else None
+    if current_elem and current_elem.get("status") == "needs_revision" and current_elem.get("feedback"):
+        ready_to_generate = [idx for idx in ready_to_generate if idx == element_index]
     if not ready_to_generate:
-        # All ready elements are already drafted — move on to QA/user
-        primary = DraftElement.model_validate(draft_elements[element_index])
+        # All ready elements are already drafted — QA will notify the user
         return _merge({
-            "messages": [AIMessage(content=f"**{primary.display_name}** is ready for review.")],
+            "messages": [],
             "draft_elements": draft_elements,
             "next_prompt": "",
         })
@@ -260,8 +267,11 @@ async def generate_element_node(state: AgentState) -> dict:
         section_config_local = _get_section_config(elem.name)
         
         # TIER 1: Literal generation (Factor 8/9, Other Significant Factors)
-        # Fixed text from predetermined narratives - no LLM call
-        if generation_tier == "literal" or section_config_local.get("style") == "predetermined_narrative":
+        # Fixed text from predetermined narratives - no LLM call.
+        # EXCEPTION: If user requested revision with feedback, upgrade to LLM
+        # so their specific content (e.g., "warehouse work") is incorporated.
+        user_requested_revision = is_rewrite_local and elem.feedback
+        if not user_requested_revision and (generation_tier == "literal" or section_config_local.get("style") == "predetermined_narrative"):
             if elem.name == "other_significant_factors":
                 # Other Significant Factors uses supervisory variant when applicable
                 is_sup = interview_data_local.is_supervisor.value or False
@@ -287,12 +297,16 @@ async def generate_element_node(state: AgentState) -> dict:
             is_rewrite=is_rewrite_local,
             qa_feedback=qa_feedback_local,
             qa_failures=qa_failures_local,
+            word_count_overrides=state.get("word_count_targets"),
         )
+
+        # Always include user feedback context so both templates can use it.
+        # get_rewrite_context() also provides previous_drafts and failure_reasons.
+        rewrite_context_local = elem.get_rewrite_context()
+        context_local.update(rewrite_context_local)
 
         if is_rewrite_local and elem.draft_history:
             template_local = jinja_env.get_template("draft_rewrite.jinja")
-            rewrite_context_local = elem.get_rewrite_context()
-            context_local.update(rewrite_context_local)
         else:
             # Use section-specific template if available, fall back to generic
             section_template = f"draft_{elem.name}.jinja"
@@ -351,42 +365,24 @@ async def generate_element_node(state: AgentState) -> dict:
             "messages": [AIMessage(content=f"I encountered an error generating the {element_name.replace('_', ' ')} section.")],
         })
 
-    # Build messages: show detailed content for the primary element, brief summaries for others
-    messages: list[AIMessage] = []
-    primary_elem: DraftElement | None = None
-    primary_content = ""
+    # No chat message here — content isn't shown in the panel until after
+    # QA review (ElementChangeTracker withholds content for "drafted" status).
+    # Telling the user "review it in the draft panel" before QA is premature
+    # and risks them reading content that gets rewritten.  The qa_review_node
+    # sends the "ready for review" message once the content is final.
+    #
+    # Track the primary element for state updates (current_element_name).
     for result in successful_results:
         elem, content, is_rewrite_flag, is_predetermined, error = result
         if error:
-            # Skip errored elements (already logged)
             continue
-        if primary_elem is None or elem.name == draft_elements[element_index]["name"]:
-            primary_elem = elem
-            primary_content = content
-        else:
-            tag = "updated draft" if is_rewrite_flag else "draft"
-            messages.append(
-                AIMessage(
-                    content=f"Generated {tag} for **{elem.display_name}** (queued for QA)."
-                )
-            )
+        state_updates.setdefault("current_element_name", elem.name)
+        # Prefer the element at current_element_index as primary
+        if elem.name == draft_elements[element_index].get("name"):
+            state_updates["current_element_name"] = elem.name
 
-    # Ensure primary message is first — content lives in the product panel,
-    # so the chat message is just a short notification
-    if primary_elem:
-        from src.utils.personality import get_completion
-        action_phrase = "Here's an updated draft for" if primary_elem.revision_count > 0 else f"{get_completion()}"
-        messages.insert(0, AIMessage(
-            content=f"{action_phrase} **{primary_elem.display_name}** — review it in the draft panel."
-        ))
-        state_updates.setdefault("current_element_name", primary_elem.name)
-
-    # If nothing was generated (should not happen), fallback
-    if not messages:
-        messages = [AIMessage(content="Drafting completed.")]
-    
     return _merge({
-        "messages": messages,
+        "messages": [],
         "draft_elements": draft_elements,
         "next_prompt": "",
     })

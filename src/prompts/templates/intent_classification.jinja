@@ -106,19 +106,24 @@ For each field extracted, follow the parsing rules below:
 
 Extract ALL questions asked:
 - Include the full question text
-- Mark `is_hr_specific: true` for HR policy questions that should be answered using OPM/federal guidance:
-  - Factor Evaluation System (FES) questions
+- Mark `is_hr_specific: true` for questions about federal HR subject matter that need OPM guidance to answer:
+  - What position descriptions are, why they're required, what goes in them
+  - Factor Evaluation System (FES) questions — factor levels, point values, requirements
   - Classification standards and methodology
   - Grade/level determination criteria
   - Series definitions and requirements
   - Supervisory position evaluation
   - OPM policies and regulations
   - Position classification concepts
-  - Examples: "What is Factor 1?", "How are GS grades determined?", "What's the difference between 2210 and 0343 series?"
-- Mark `is_hr_specific: false` for general questions about:
-  - The PD writing process itself
-  - What information Pete needs
-  - Clarification of interview fields
+  - Examples: "What is a PD?", "Why are PDs important?", "What is Factor 1?", "How are GS grades determined?", "What's the difference between 2210 and 0343 series?", "What are the required elements of a PD?"
+- Mark `is_hr_specific: false` for questions directed at Pete about himself or his process:
+  - **IMPORTANT**: If the user addresses Pete by name, says "you", "your", "yourself", "PD3r", or asks about Pete's capabilities/process, this is NOT hr_specific — Pete has built-in self-knowledge for these
+  - How Pete (PD3r) works, what Pete does, how Pete generates drafts
+  - What information Pete needs from the user
+  - Pete's sources, methodology, capabilities, or limitations
+  - Clarification of interview fields Pete is asking about
+  - Examples: "How do you write a PD?", "Tell me about yourself", "How does PD3r work?", "Where do you get your information?", "What do you need from me?", "How long will this take?"
+  - **Conversation context matters**: If the user has been asking Pete about himself, follow-up questions like "how do you do it?" or "explain more" are likely still about Pete, not general HR policy
 - Mark `is_process_question: true` for PD process questions (how does this work, what's next)
 
 ## Modifications Extraction

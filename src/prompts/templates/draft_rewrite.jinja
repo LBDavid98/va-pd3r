@@ -100,6 +100,9 @@ Revise the draft above to address the listed issues while **maintaining the same
 {% if target_word_count %}
 **Target length**: approximately {{ target_word_count }} words. Prioritize completeness of all requirements over hitting this target exactly — it is guidance, not a hard limit.
 {% endif %}
+{% if has_user_feedback and latest_user_feedback %}
+**IMPORTANT**: The user's feedback above takes priority over default targets. If the user specifies a word count, length, or style change, follow their instruction even if it conflicts with the default target.
+{% endif %}
 **CRITICAL**: Do NOT explicitly state the grade level (e.g., "at the GS-11 level") or the series number (e.g., "1560 series") anywhere in the output. These are classification metadata — the PD describes the work without referencing them.
 
 Generate ONLY the revised {{ section_name }} section content. No headers, explanations, or markdown formatting around the output.

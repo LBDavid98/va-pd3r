@@ -56,6 +56,9 @@ class AgentState(TypedDict):
     # Session resume flow
     is_resume: bool  # Signals init_node to show resume greeting (session restored from checkpoint)
 
+    # Per-session word count overrides (set by frontend, used by generate_element_node)
+    word_count_targets: Optional[dict]  # {section_name: int} overrides for TARGET_WORD_COUNTS
+
     # Error handling (4.5)
     validation_error: Optional[str]  # Field validation error message for user display
     last_error: Optional[str]  # Last error message (for recovery handling)

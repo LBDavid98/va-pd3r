@@ -19,7 +19,7 @@ GenerationTier = Literal["literal", "llm"]
 # QA requirement completeness always takes priority over hitting word targets.
 TARGET_WORD_COUNTS: dict[str, int] = {
     "introduction": 240,
-    "background": 400,
+    "background": 200,
     "duties_overview": 300,
     "major_duties": 300,
     "factor_1_knowledge": 270,
@@ -57,6 +57,13 @@ SECTION_REGISTRY: dict[str, dict] = {
     },
     "duties_overview": {
         "description": "Major duties and responsibilities overview",
+        "requires": ["major_duties", "daily_activities"],
+        "style": "narrative",
+        "prompt_key": "MAJOR_DUTIES_PROMPT",
+        "generation_tier": "llm",
+    },
+    "major_duties": {
+        "description": "Major Duties and Responsibilities — write each duty area as a narrative paragraph with its percentage weight. Start each paragraph with the duty area name and weight (e.g., 'Program Analysis (40%):'), then describe the specific tasks in flowing prose. Do NOT use bullet points or numbered lists. Weights must sum to 100%.",
         "requires": ["major_duties", "daily_activities"],
         "style": "narrative",
         "prompt_key": "MAJOR_DUTIES_PROMPT",

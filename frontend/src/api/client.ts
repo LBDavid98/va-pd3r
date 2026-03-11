@@ -72,6 +72,20 @@ export async function getConfig(): Promise<LLMConfigResponse> {
   return request<LLMConfigResponse>("/config")
 }
 
+export async function getWordCountDefaults(): Promise<Record<string, number>> {
+  return request<Record<string, number>>("/config/word-counts")
+}
+
+export async function patchWordCounts(
+  sessionId: string,
+  targets: Record<string, number>,
+): Promise<{ status: string; targets_updated: string[] }> {
+  return request(`/sessions/${sessionId}/word-counts`, {
+    method: "PATCH",
+    body: JSON.stringify({ targets }),
+  })
+}
+
 export async function setConfig(
   apiKey: string,
   baseUrl?: string,
