@@ -255,7 +255,11 @@ async def websocket_chat(websocket: WebSocket, session_id: str, manager: Session
                             except (asyncio.CancelledError, Exception):
                                 pass
                             done = True
-                        # Other messages while processing are dropped
+                        else:
+                            logger.warning(
+                                "Dropped %r message for session %s — processing in progress",
+                                inner_type, session_id,
+                            )
                     except (json.JSONDecodeError, Exception):
                         pass
 
