@@ -20,7 +20,7 @@ async def websocket_chat(websocket: WebSocket, session_id: str, manager: Session
 
     Protocol:
         Client sends: {"type": "user_message", "data": {"content": "..."}}
-        Client sends: {"type": "element_action", "data": {"element": "...", "action": "approve|reject|regenerate", "feedback": "..."}}
+        Client sends: {"type": "element_action", "data": {"element": "...", "action": "approve|reject|regenerate|edit", "feedback": "...", "content": "..."}}  # "edit" requires content field
         Client sends: {"type": "stop"}
         Client sends: {"type": "ping"}
         Server sends: {"type": "agent_message", "data": {"content": "...", "phase": "...", "prompt": "..."}}
@@ -179,6 +179,31 @@ async def websocket_chat(websocket: WebSocket, session_id: str, manager: Session
                 ea_element = ea_data.get("element", "")
                 ea_action = ea_data.get("action", "")
                 ea_feedback = ea_data.get("feedback", "")
+
+                # "edit" action: persist hand-edited content directly to checkpoint.
+                # Does NOT resume the graph — just updates state and confirms.
+                if ea_action == "edit":
+                    ea_content = ea_data.get("content", "")
+                    if not ea_element or not ea_content:
+                        await websocket.send_json({
+                            "type": "error",
+                            "data": {"message": "edit action requires element and content"},
+                        })
+                        continue
+                    try:
+                        await manager.update_element_content(session_id, ea_element, ea_content)
+                        await websocket.send_json({
+                            "type": "element_update",
+                            "data": {"name": ea_element, "status": "approved", "content": ea_content},
+                        })
+                    except Exception as e:
+                        logger.exception("Failed to update element content")
+                        await websocket.send_json({
+                            "type": "error",
+                            "data": {"message": str(e)},
+                        })
+                    continue
+
                 if not ea_element or ea_action not in ("approve", "reject", "regenerate"):
                     await websocket.send_json({
                         "type": "error",

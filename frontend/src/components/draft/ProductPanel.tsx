@@ -271,8 +271,15 @@ function DraftSection({
       locked: true,
       edited: true,
     })
+    // Persist edit to backend checkpoint so exports use updated content
+    if (wsRef) {
+      wsRef.send(JSON.stringify({
+        type: "element_action",
+        data: { element: sectionName, action: "edit", content: editDraft },
+      }))
+    }
     setEditing(false)
-  }, [sectionName, editDraft, updateElement])
+  }, [sectionName, editDraft, updateElement, wsRef])
 
   const cancelEdit = useCallback(() => {
     setEditing(false)

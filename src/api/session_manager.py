@@ -582,6 +582,39 @@ class SessionManager:
             file_bytes = export_to_markdown_bytes(draft_elements, interview_data)
             return file_bytes, "text/markdown"
 
+    async def update_element_content(self, session_id: str, element_name: str, content: str) -> None:
+        """Update the content of a draft element in the checkpoint.
+
+        Called when the user hand-edits element text in the frontend.
+        Persists the edit so exports use the updated content.
+
+        Args:
+            session_id: Session ID
+            element_name: Element name (e.g. "factor_9_work_environment")
+            content: New content text
+        """
+        if session_id not in self._sessions:
+            raise ValueError(f"Session {session_id} not found")
+
+        config = self._config_for(session_id)
+        state = await self._graph.aget_state(config)
+        if not state or not state.values:
+            raise ValueError("No state available for session")
+
+        draft_elements = list(state.values.get("draft_elements", []))
+        found = False
+        for i, elem in enumerate(draft_elements):
+            if isinstance(elem, dict) and elem.get("name") == element_name:
+                draft_elements[i] = {**elem, "content": content}
+                found = True
+                break
+
+        if not found:
+            raise ValueError(f"Element '{element_name}' not found in draft")
+
+        await self._graph.aupdate_state(config, {"draft_elements": draft_elements})
+        logger.info("Updated content for element '%s' in session %s", element_name, session_id[:8])
+
     async def delete_session(self, session_id: str) -> bool:
         """Delete a session."""
         if session_id in self._sessions:

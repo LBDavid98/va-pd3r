@@ -167,7 +167,7 @@ export function useWebSocket(sessionId: string | null) {
             const data = msg.data as unknown as WSElementUpdate
             updateElement(data.name, {
               status: data.status,
-              content: data.content ?? undefined,
+              ...(data.content != null ? { content: data.content } : {}),
               ...(data.qa_review ? { qa_review: data.qa_review } : {}),
             })
             break

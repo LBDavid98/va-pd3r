@@ -273,6 +273,41 @@ PD authoring is a collaboration between **management** (who drafts the position 
 
 ---
 
+## Federal Government-Wide Impact Sizing (GS Subset)
+
+To estimate potential federal-wide impact, we use OPM Federal Workforce Data (FWD) as of **January 2026**.
+
+### Workforce Baseline
+
+| Metric | Count | Share |
+|--------|-------|-------|
+| Total federal civilian workforce | 2,035,344 | 100% |
+| General Schedule (GS) workforce | 1,221,449 | 60.0% |
+| Non-GS civilian workforce | 813,895 | 40.0% |
+
+> Interpretation: GS employees represent the majority of the federal civilian workforce, so benefits from PD3r focused on GS positions can scale broadly across government.
+
+### Scenario Sizing for Government-Wide Planning
+
+Using earlier assumptions from this business case:
+
+- Annual PDs requiring work = workforce × 7% turnover × 2/3 requiring PD updates
+- Savings per PD = **$395** (traditional labor cost minus PD3r labor cost)
+- Steady-state operating cost = **$4.10 per PD** (from Year 2+ operating model)
+- Net savings = gross labor savings minus operating cost
+
+| Scenario | GS Employees in Scope | Est. PDs/Year | Gross Labor Savings | Est. Operating Cost | Net Annual Savings |
+|----------|------------------------|---------------|---------------------|---------------------|--------------------|
+| 1% GS adoption | 12,214 | 570 | $225,150 | $2,337 | **$222,813** |
+| 5% GS adoption | 61,072 | 2,850 | $1,125,750 | $11,685 | **$1,114,065** |
+| 10% GS adoption | 122,145 | 5,700 | $2,251,500 | $23,370 | **$2,228,130** |
+
+At the same adoption levels, recovered labor capacity is approximately **3,306**, **16,530**, and **33,060** hours annually, respectively (based on 5.8 hours saved per PD).
+
+> Implementation note: These estimates assume baseline PD3r capability. Additional development effort would still be required to align outputs with specialized series requirements (for example, GS-2210 IT/cyber PD conventions and agency-specific classification expectations).
+
+---
+
 ## Risks and Mitigations
 
 | Risk | Mitigation |
